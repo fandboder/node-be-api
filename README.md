@@ -1,6 +1,8 @@
 # F&B Back-End Project
 
-## Tech Stack
+[TODO] Description for f&b 
+
+## 🧑‍💻 Tech Stack
 ?
 
 example:
@@ -9,7 +11,7 @@ example:
 - Mysql 8.0.32
 - Grape API
 
-## Start
+## 🗄 Start
 ?
 
 example:
@@ -31,7 +33,7 @@ example:
 
 6. Local mail link: http://localhost:3000/mailer
 
-## Dummy data
+## 📁 Dummy data
 ?
 
 example
