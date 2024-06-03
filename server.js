@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
 const { connectDB, sequelize } = require('./src/config/database');
+const pructRoutes = require('./src/routes/product.routes')
 
 // Load biến môi trường từ .env
 dotenv.config();
@@ -20,8 +21,8 @@ app.use(morgan('dev'));
 app.use(helmet());
 app.use(express.json());
 
-// Định nghĩa các routes
-//app.use('/api/orders', require('./src/routes/orderRoutes'));
+// Định nghĩa routes
+app.use('/api', pructRoutes);
 
 // Route gốc
 app.get('/', (req, res) => {
