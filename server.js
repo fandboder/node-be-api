@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
 const { connectDB, sequelize } = require('./src/config/database');
-const pructRoutes = require('./src/routes/product.routes')
+const productRoutes = require('./src/routes/product.routes');
 
 // Load biến môi trường từ .env
 dotenv.config();
@@ -22,7 +22,8 @@ app.use(helmet());
 app.use(express.json());
 
 // Định nghĩa routes
-app.use('/api', pructRoutes);
+app.use('/api', productRoutes);
+
 
 // Route gốc
 app.get('/', (req, res) => {
@@ -30,8 +31,8 @@ app.get('/', (req, res) => {
 });
 
 // Đồng bộ các model với database và bắt đầu server
-sequelize.sync().then(() => {
-    app.listen(port, () => {
-        console.log(`Server is running on http://localhost:${port}`);
-    });
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
 });
+
+
