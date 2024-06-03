@@ -1,0 +1,166 @@
+openapi: 3.0.0
+info:
+  title: FNB API
+  description: API for managing products with Swagger
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/getProducts:
+    get:
+      summary: Get all products
+      responses:
+        '200':
+          description: A list of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/addProduct:
+    post:
+      summary: Create a new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '201':
+          description: The created product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /api/deleteProduct/{id}:
+    delete:
+      summary: Delete a product by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the product to delete
+      responses:
+        '200':
+          description: Product deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+               message: Sản phẩm không tồn tại     
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                message: Error while deleting product    
+  /api/updateProduct/{id}:
+    put:
+      summary: Update a product by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the product to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        category_id:
+          type: integer
+        img:
+          type: string
+      example:
+        name: Name
+        description: Description
+        price: 100
+        category_id: 1
+        img: https://example.com/product.jpg
+    ProductInput:
+      type: object
+      required:
+        - name
+        - description
+        - price
+        - category_id
+        - img
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        category_id:
+          type: integer
+        img:
+          type: string
+      example:
+        name: Name
+        description: Description
+        price: 100
+        category_id: 1
+        img: https://example.com/product.jpg
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+      example:
+        message: Operation successful
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      example:
+        error: Operation error
