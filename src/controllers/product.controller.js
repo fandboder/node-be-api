@@ -30,4 +30,27 @@ exports.createProduct = async (req, res) => {
         console.error('Error while creating product:', error);
         res.status(500).json({ error: 'Error while creating product' });
     }
-}
+};
+
+// Xóa sản phẩm từ cơ sở dữ liệu
+exports.deleteProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+
+        // Tìm và xóa sản phẩm từ cơ sở dữ liệu
+        const deletedProduct = await Product.destroy({
+            where: {
+                product_id: productId
+            }
+        });
+
+        if (deletedProduct) {
+            res.json({ message: 'Xóa sản phẩm thành công' });
+        } else {
+            res.status(404).json({ error: 'Sản phẩm không tồn tại' });
+        }
+    } catch (error) {
+        console.error('Error while deleting product:', error);
+        res.status(500).json({ error: 'Error while deleting product' });
+    }
+};
