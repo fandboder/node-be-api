@@ -75,13 +75,13 @@ paths:
           content:
             application/json:
               schema:
-                message: Sản phẩm không tồn tại
+                $ref: "#/components/schemas/Error"
         "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                message: Error while deleting product
+                $ref: "#/components/schemas/Error"
   /api/updateProduct/{id}:
     put:
       tags:
