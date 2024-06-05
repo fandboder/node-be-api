@@ -36,7 +36,7 @@ paths:
   /api/addProduct:
     post:
       tags:
-          - Product
+        - Product
       summary: Create a new product
       requestBody:
         required: true
@@ -51,10 +51,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Message"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/deleteProduct/{id}:
     delete:
       tags:
-          - Product
+        - Product
       summary: Delete a product by ID
       parameters:
         - in: path
@@ -85,7 +91,7 @@ paths:
   /api/updateProduct/{id}:
     put:
       tags:
-          - Product
+        - Product
       summary: Update a product by ID
       parameters:
         - in: path
@@ -119,11 +125,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/getCategories:
+    get:
+      summary: Lấy danh sách tất cả các danh mục
+      tags:
+        - Category
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     Product:
       type: object
       properties:
+        product_id:
+          type: integer
+          description: ID của sản phẩm
         name:
           type: string
         description:
@@ -135,11 +165,13 @@ components:
         img:
           type: string
       example:
-        name: Name
-        description: Description
-        price: 100
+        product_id: 1
+        name: Example Product
+        description: This is an example product
+        price: 100.0
         category_id: 1
         img: https://example.com/product.jpg
+
     ProductInput:
       type: object
       required:
@@ -160,11 +192,25 @@ components:
         img:
           type: string
       example:
-        name: Name
-        description: Description
-        price: 100
+        name: Example Product
+        description: This is an example product
+        price: 100.0
         category_id: 1
         img: https://example.com/product.jpg
+
+    Category:
+      type: object
+      properties:
+        category_id:
+          type: integer
+          description: ID của danh mục
+        name:
+          type: string
+          description: Tên của danh mục
+      example:
+        category_id: 1
+        name: Example Category
+
     Message:
       type: object
       properties:
@@ -172,6 +218,7 @@ components:
           type: string
       example:
         message: Operation successful
+
     Error:
       type: object
       properties:
