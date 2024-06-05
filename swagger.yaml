@@ -75,21 +75,13 @@ paths:
           content:
             application/json:
               schema:
-<<<<<<< HEAD
                 $ref: "#/components/schemas/Error"
-=======
-                message: Sản phẩm không tồn tại
->>>>>>> 985b510 (feat: update swagger.yaml)
         "500":
           description: Internal server error
           content:
             application/json:
               schema:
-<<<<<<< HEAD
                 $ref: "#/components/schemas/Error"
-=======
-                message: Error while deleting product
->>>>>>> 985b510 (feat: update swagger.yaml)
   /api/updateProduct/{id}:
     put:
       tags:

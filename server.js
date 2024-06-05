@@ -20,27 +20,15 @@ app.use(morgan('dev'));
 app.use(helmet());
 app.use(express.json());
 
-<<<<<<< HEAD
 app.use('/api', productRoutes);
 
 const swaggerDocument = YAML.load('./swagger.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-=======
-// Định nghĩa routes
-app.use('/api', productRoutes);
-
->>>>>>> 526c271 (feature: get api)
 
 app.get('/', (req, res) => {
     res.send('Welcome to the F&B Order API');
 });
 
-<<<<<<< HEAD
-=======
-// Đồng bộ các model với database và bắt đầu server
->>>>>>> 526c271 (feature: get api)
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
-
-
