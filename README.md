@@ -20,6 +20,8 @@ example:
 3. Start:
 
 ```
+  docker compose build
+  docker compose up
   npm i
   npm run dev
 ```
