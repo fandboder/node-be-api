@@ -7,7 +7,7 @@ const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const { connectDB, sequelize } = require('./src/config/database');
 const productRoutes = require('./src/routes/product.routes');
-const categoryRoutes = require('./src/routes/category.routes')
+const categoryRoutes = require('./src/routes/category.routes');
 
 dotenv.config();
 

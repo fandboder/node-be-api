@@ -127,12 +127,12 @@ paths:
                 $ref: "#/components/schemas/Error"
   /api/getCategories:
     get:
-      summary: Lấy danh sách tất cả các danh mục
+      summary: Get all categories
       tags:
         - Category
       responses:
         '200':
-          description: Thành công
+          description: Success
           content:
             application/json:
               schema:
@@ -145,7 +145,61 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  /api/addCategory:
+    post:
+      tags:
+        - Category
+      summary: Add a new category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '201':
+          description: Category added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/deleteCategory/{id}:
+    delete:
+      tags:
+        - Category
+      summary: Delete a category by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the category to delete
+      responses:
+        '200':
+          description: Category deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Product:
@@ -153,7 +207,7 @@ components:
       properties:
         product_id:
           type: integer
-          description: ID của sản phẩm
+          description: ID of the product
         name:
           type: string
         description:
@@ -203,13 +257,24 @@ components:
       properties:
         category_id:
           type: integer
-          description: ID của danh mục
+          description: ID of the category
         name:
           type: string
-          description: Tên của danh mục
+          description: Name of the category
       example:
         category_id: 1
         name: Example Category
+
+    CategoryInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Name of the category
+      example:
+        name: New Category
 
     Message:
       type: object
