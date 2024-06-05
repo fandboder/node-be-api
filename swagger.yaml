@@ -5,43 +5,62 @@ info:
   version: 1.0.0
 servers:
   - url: http://localhost:3000
+
+tags:
+  - name: Product
+    description: Everything about your Products
+  - name: Category
+    description: Product Category
+
 paths:
   /api/getProducts:
     get:
+      tags:
+        - Product
       summary: Get all products
       responses:
-        '200':
+        "200":
           description: A list of products
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
-        '500':
+                  $ref: "#/components/schemas/Product"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /api/addProduct:
     post:
+      tags:
+        - Product
       summary: Create a new product
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductInput'
+              $ref: "#/components/schemas/ProductInput"
       responses:
-        '201':
+        "201":
           description: The created product
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
+                $ref: "#/components/schemas/Message"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/deleteProduct/{id}:
     delete:
+      tags:
+        - Product
       summary: Delete a product by ID
       parameters:
         - in: path
@@ -51,26 +70,28 @@ paths:
             type: string
           description: The ID of the product to delete
       responses:
-        '200':
+        "200":
           description: Product deleted successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
-        '404':
+                $ref: "#/components/schemas/Message"
+        "404":
           description: Product not found
           content:
             application/json:
               schema:
-               message: Sản phẩm không tồn tại     
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                message: Error while deleting product    
+                $ref: "#/components/schemas/Error"
   /api/updateProduct/{id}:
     put:
+      tags:
+        - Product
       summary: Update a product by ID
       parameters:
         - in: path
@@ -84,16 +105,128 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductInput'
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "200":
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/getCategories:
+    get:
+      summary: Get all categories
+      tags:
+        - Category
       responses:
         '200':
-          description: Product updated successfully
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/addCategory:
+    post:
+      tags:
+        - Category
+      summary: Add a new category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '201':
+          description: Category added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/deleteCategory/{id}:
+    delete:
+      tags:
+        - Category
+      summary: Delete a category by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the category to delete
+      responses:
+        '200':
+          description: Category deleted successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
         '404':
-          description: Product not found
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/updateCategory/{id}:
+    put:
+      tags:
+        - Category
+      summary: Update a category by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the category to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Category not found
           content:
             application/json:
               schema:
@@ -109,6 +242,9 @@ components:
     Product:
       type: object
       properties:
+        product_id:
+          type: integer
+          description: ID of the product
         name:
           type: string
         description:
@@ -120,11 +256,13 @@ components:
         img:
           type: string
       example:
-        name: Name
-        description: Description
-        price: 100
+        product_id: 1
+        name: Example Product
+        description: This is an example product
+        price: 100.0
         category_id: 1
         img: https://example.com/product.jpg
+
     ProductInput:
       type: object
       required:
@@ -145,11 +283,36 @@ components:
         img:
           type: string
       example:
-        name: Name
-        description: Description
-        price: 100
+        name: Example Product
+        description: This is an example product
+        price: 100.0
         category_id: 1
         img: https://example.com/product.jpg
+
+    Category:
+      type: object
+      properties:
+        category_id:
+          type: integer
+          description: ID of the category
+        name:
+          type: string
+          description: Name of the category
+      example:
+        category_id: 1
+        name: Example Category
+
+    CategoryInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Name of the category
+      example:
+        name: New Category
+
     Message:
       type: object
       properties:
@@ -157,6 +320,7 @@ components:
           type: string
       example:
         message: Operation successful
+
     Error:
       type: object
       properties:
