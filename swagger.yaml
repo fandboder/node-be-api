@@ -5,43 +5,56 @@ info:
   version: 1.0.0
 servers:
   - url: http://localhost:3000
+
+tags:
+  - name: Product
+    description: Everything about your Products
+  - name: Category
+    description: Product Category
+
 paths:
   /api/getProducts:
     get:
+      tags:
+        - Product
       summary: Get all products
       responses:
-        '200':
+        "200":
           description: A list of products
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
-        '500':
+                  $ref: "#/components/schemas/Product"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /api/addProduct:
     post:
+      tags:
+          - Product
       summary: Create a new product
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductInput'
+              $ref: "#/components/schemas/ProductInput"
       responses:
-        '201':
+        "201":
           description: The created product
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
+                $ref: "#/components/schemas/Message"
   /api/deleteProduct/{id}:
     delete:
+      tags:
+          - Product
       summary: Delete a product by ID
       parameters:
         - in: path
@@ -51,26 +64,28 @@ paths:
             type: string
           description: The ID of the product to delete
       responses:
-        '200':
+        "200":
           description: Product deleted successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
-        '404':
+                $ref: "#/components/schemas/Message"
+        "404":
           description: Product not found
           content:
             application/json:
               schema:
-               message: Sản phẩm không tồn tại     
-        '500':
+                message: Sản phẩm không tồn tại
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                message: Error while deleting product    
+                message: Error while deleting product
   /api/updateProduct/{id}:
     put:
+      tags:
+          - Product
       summary: Update a product by ID
       parameters:
         - in: path
@@ -84,26 +99,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductInput'
+              $ref: "#/components/schemas/ProductInput"
       responses:
-        '200':
+        "200":
           description: Product updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
-        '404':
+                $ref: "#/components/schemas/Message"
+        "404":
           description: Product not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     Product:
