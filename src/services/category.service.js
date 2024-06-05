@@ -1,4 +1,4 @@
-const Category = require('../models/categoty.modle')
+const Category = require('../models/categoty.model')
 
 exports.getAllCategories = async () => {
     try {
