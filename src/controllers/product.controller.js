@@ -64,3 +64,17 @@ exports.updateProduct = async (req, res) => {
         res.status(500).json({ error: 'Error while updating product' });
     }
 };
+
+exports.getProductById = async (req, res) => {
+    try {
+        const product = await Product.findByPk(req.params.id);
+        if (product) {
+            res.json(product);
+        } else {
+            res.status(404).json({ message: 'Product not found' });
+        }
+    } catch (error) {
+        console.error('Error while getting product: ', error);
+        res.status(500).json({ error: 'Error while getting product' });
+    }
+}
