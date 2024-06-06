@@ -64,3 +64,49 @@ exports.updateProduct = async (req, res) => {
         res.status(500).json({ error: 'Error while updating product' });
     }
 };
+
+exports.getProductById = async (req, res) => {
+    try {
+        const product = await Product.findByPk(req.params.id);
+        if (product) {
+            res.json(product);
+        } else {
+            res.status(404).json({ message: 'Product not found' });
+        }
+    } catch (error) {
+        console.error('Error while getting product: ', error);
+        res.status(500).json({ error: 'Error while getting product' });
+    }
+}
+
+
+exports.getProductsByCategory = async (req, res) => {
+    try {
+        const categoryId = req.params.categoryId;
+        const products = await Product.findAll({ where: { category_id: categoryId } });
+        if (products.length > 0) {
+            res.json(products);
+        } else {
+            res.status(404).json({ error: 'No Products found in this category' });
+        }
+    } catch (error) {
+        console.error('Error while getting products by category: ', error);
+        res.status(500).json({ error: 'Error while getting products by category' });
+    }
+};
+
+
+exports.getProductByName = async (req, res) => {
+    try {
+        const name = req.params.name;
+        const prodcut = await Product.findOne({ where: { name: name } })
+        if (prodcut) {
+            res.json(prodcut)
+        } else {
+            res.status(404).json({ error: 'Product not found' });
+        }
+    } catch (error) {
+        console.error('Error while getting product by name: ', error);
+        res.status(404).json({ error: 'Error while getting product by name' });
+    }
+};

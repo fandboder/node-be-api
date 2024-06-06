@@ -58,3 +58,4 @@ exports.updateCategory = async (req, res) => {
         res.status(500).json({ error: 'Error while updating category' });
     }
 };
+

@@ -3,7 +3,6 @@
 [TODO] Description for f&b 
 
 ## 🧑‍💻 Tech Stack
-?
 
 example:
 - Node v20.x 
@@ -12,7 +11,6 @@ example:
 - REST API
 
 ## 🗄 Start
-?
 
 example:
 1. Install package
@@ -29,7 +27,6 @@ example:
 5. link swagger: http://localhost:3000/api-docs
 
 ## 📁 Dummy data
-?
 
 example
 1. Admin
