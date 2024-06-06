@@ -431,4 +431,3 @@ components:
           type: string
       example:
         error: Operation error
-
