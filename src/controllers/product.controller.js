@@ -78,3 +78,19 @@ exports.getProductById = async (req, res) => {
         res.status(500).json({ error: 'Error while getting product' });
     }
 }
+
+
+exports.getProductsByCategory = async (req, res) => {
+    try {
+        const categoryId = req.params.categoryId;
+        const products = await Product.findAll({ where: { category_id: categoryId } });
+        if (products.length > 0) {
+            res.json(products);
+        } else {
+            res.status(404).json({ error: 'No Products found in this category' });
+        }
+    } catch (error) {
+        console.error('Error while getting products by category: ', error);
+        res.status(500).json({ error: 'Error while getting products by category' });
+    }
+}
