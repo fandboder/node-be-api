@@ -1,8 +1,15 @@
 openapi: 3.0.0
 info:
   title: FNB API
-  description: API for managing products with Swagger
+  description: >
+    **API for managing products with Swagger**
+
+    Developed by **tn823**
   version: 1.0.0
+  contact:
+    name: Nguyễn Trọng Nghĩa
+    url: https://github.com/tn823
+    email: trnghia823@gmail.com
 servers:
   - url: http://localhost:3000
 
