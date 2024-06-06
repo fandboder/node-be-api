@@ -71,7 +71,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/products/{name}:
+  /api/getProducts/name/{name}:
     get:
       summary: Get product by name
       tags:
