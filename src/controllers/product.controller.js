@@ -93,4 +93,20 @@ exports.getProductsByCategory = async (req, res) => {
         console.error('Error while getting products by category: ', error);
         res.status(500).json({ error: 'Error while getting products by category' });
     }
-}
+};
+
+
+exports.getProductByName = async (req, res) => {
+    try {
+        const name = req.params.name;
+        const prodcut = await Product.findOne({ where: { name: name } })
+        if (prodcut) {
+            res.json(prodcut)
+        } else {
+            res.status(404).json({ error: 'Product not found' });
+        }
+    } catch (error) {
+        console.error('Error while getting product by name: ', error);
+        res.status(404).json({ error: 'Error while getting product by name' });
+    }
+};

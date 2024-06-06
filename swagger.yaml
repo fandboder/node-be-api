@@ -64,7 +64,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/getProductsByCategory/{categoryId}:
+  /api/products/{name}:
+    get:
+      summary: Get product by name
+      tags:
+        - Product
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          description: The name of the product to get
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/getProducts/category/{categoryId}:
     get:
       summary: Get products by category ID
       tags:

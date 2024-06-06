@@ -12,6 +12,7 @@ router.put('/updateProduct/:id', productController.updateProduct);
 
 router.get('/getProducts/:id', productController.getProductById);
 
-router.get('/getProductsByCategory/:categoryId', productController.getProductsByCategory);
+router.get('/getProducts/category/:categoryId', productController.getProductsByCategory);
 
+router.get('/getProduct/:name', productController.getProductByName);
 module.exports = router;
