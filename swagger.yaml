@@ -443,21 +443,22 @@ components:
       properties:
         account_id:
           type: integer
-          description: ID của tài khoản
+          description: ID account
         username:
           type: string
-          description: Tên đăng nhập của tài khoản
-        email:
-          type: string
-          description: Email của tài khoản
+          description: Your username
         password:
           type: string
-          description: Mật khẩu của tài khoản
+          description: Your password
+        position:
+          type: string
+          description: Your account positon
+
       example:
         account_id: 1
-        username: example_user
-        email: example_user@example.com
-        password: example_password
+        username: admin
+        password: 123
+        position: admin
 
     Message:
       type: object
