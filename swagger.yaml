@@ -18,6 +18,8 @@ tags:
     description: Everything about your Products
   - name: Category
     description: Product Category
+  - name: Account
+    description: Account List
 
 paths:
   /api/getProducts:
@@ -339,6 +341,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/getAccounts:
+    get:
+      summary: Get all accounts
+      tags:
+        - Account
+      responses:
+        "200":
+          description: A list of accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Account"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
 components:
   schemas:
@@ -415,6 +437,27 @@ components:
           description: Tên của danh mục
       example:
         name: New Category
+
+    Account:
+      type: object
+      properties:
+        account_id:
+          type: integer
+          description: ID của tài khoản
+        username:
+          type: string
+          description: Tên đăng nhập của tài khoản
+        email:
+          type: string
+          description: Email của tài khoản
+        password:
+          type: string
+          description: Mật khẩu của tài khoản
+      example:
+        account_id: 1
+        username: example_user
+        email: example_user@example.com
+        password: example_password
 
     Message:
       type: object
