@@ -8,6 +8,8 @@ const YAML = require('yamljs');
 const { connectDB, sequelize } = require('./src/config/database');
 const productRoutes = require('./src/routes/product.routes');
 const categoryRoutes = require('./src/routes/category.routes');
+const accountRoutes = require('./src/routes/account.routes');
+
 
 dotenv.config();
 
@@ -25,6 +27,9 @@ app.use(express.json());
 //routes
 app.use('/api', productRoutes);
 app.use('/api', categoryRoutes);
+app.use('/api', accountRoutes);
+
+
 
 const swaggerDocument = YAML.load('./swagger.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

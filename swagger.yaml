@@ -18,6 +18,8 @@ tags:
     description: Everything about your Products
   - name: Category
     description: Product Category
+  - name: Account
+    description: Account List
 
 paths:
   /api/getProducts:
@@ -71,7 +73,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/products/{name}:
+  /api/getProducts/name/{name}:
     get:
       summary: Get product by name
       tags:
@@ -339,6 +341,119 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/getAccounts:
+    get:
+      summary: Get all accounts
+      tags:
+        - Account
+      responses:
+        "200":
+          description: A list of accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Account"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/addAccount:
+    post:
+      summary: Create a new account
+      tags:
+        - Account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountInput'
+      responses:
+        "201":
+          description: The created account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/deleteAccount/{id}:
+    delete:
+      tags:
+        - Account
+      summary: Delete an account by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the account to delete
+      responses:
+        "200":
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/updateAccount/{id}:
+    put:
+      tags:
+        - Account
+      summary: Update an account by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the account to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountInput' # Thay thế bằng schema tương ứng nếu cần
+      responses:
+        "200":
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
 
 components:
   schemas:
@@ -415,6 +530,50 @@ components:
           description: Tên của danh mục
       example:
         name: New Category
+
+    Account:
+      type: object
+      properties:
+        account_id:
+          type: integer
+          description: ID account
+        username:
+          type: string
+          description: Your username
+        password:
+          type: string
+          description: Your password
+        position:
+          type: string
+          description: Your account positon
+
+      example:
+        account_id: 1
+        username: admin
+        password: 123
+        position: admin
+
+    AccountInput:
+      type: object
+      required:
+        - username
+        - password
+        - position
+      properties:
+        username:
+          type: string
+          description: Username of the account
+        password:
+          type: string
+          description: Password of the account
+        position:
+          type: string
+          description: Position of the account
+      example:
+        username: username
+        password: password
+        position: position
+
 
     Message:
       type: object

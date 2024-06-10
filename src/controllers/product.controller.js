@@ -1,4 +1,5 @@
 const Product = require("../models/product.model.js");
+const { Op } = require("sequelize");
 
 exports.getAllProducts = async (req, res) => {
     try {
@@ -99,14 +100,20 @@ exports.getProductsByCategory = async (req, res) => {
 exports.getProductByName = async (req, res) => {
     try {
         const name = req.params.name;
-        const prodcut = await Product.findOne({ where: { name: name } })
-        if (prodcut) {
-            res.json(prodcut)
+        const product = await Product.findAll({
+            where: {
+                name: {
+                    [Op.like]: `%${name}%`
+                }
+            }
+        });
+        if (product.length > 0) {
+            res.json(product);
         } else {
             res.status(404).json({ error: 'Product not found' });
         }
     } catch (error) {
         console.error('Error while getting product by name: ', error);
-        res.status(404).json({ error: 'Error while getting product by name' });
+        res.status(500).json({ error: 'Error while getting product by name' });
     }
 };
