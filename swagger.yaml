@@ -385,6 +385,76 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/deleteAccount/{id}:
+    delete:
+      tags:
+        - Account
+      summary: Delete an account by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the account to delete
+      responses:
+        "200":
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/updateAccount/{id}:
+    put:
+      tags:
+        - Account
+      summary: Update an account by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the account to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountInput' # Thay thế bằng schema tương ứng nếu cần
+      responses:
+        "200":
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
 components:
   schemas:
     Product:
@@ -492,17 +562,18 @@ components:
       properties:
         username:
           type: string
-          description: Your username
+          description: Username of the account
         password:
           type: string
-          description: Your password
+          description: Password of the account
         position:
           type: string
-          description: Your account position
+          description: Position of the account
       example:
-        username: admin
-        password: 123
-        position: admin
+        username: username
+        password: password
+        position: position
+
 
     Message:
       type: object
