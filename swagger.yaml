@@ -361,7 +361,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
+  /api/addAccount:
+    post:
+      summary: Create a new account
+      tags:
+        - Account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountInput'
+      responses:
+        "201":
+          description: The created account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Product:
@@ -456,6 +479,27 @@ components:
 
       example:
         account_id: 1
+        username: admin
+        password: 123
+        position: admin
+
+    AccountInput:
+      type: object
+      required:
+        - username
+        - password
+        - position
+      properties:
+        username:
+          type: string
+          description: Your username
+        password:
+          type: string
+          description: Your password
+        position:
+          type: string
+          description: Your account position
+      example:
         username: admin
         password: 123
         position: admin
