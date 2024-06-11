@@ -4,7 +4,8 @@
   "description": "Description for f&b",
   "main": "index.js",
   "engines": {
-    "node": "20.x"
+    "node": "20.x",
+    "npm": "10.x"
   },
   "scripts": {
     "start": "node server.js",
