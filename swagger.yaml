@@ -11,7 +11,7 @@ info:
     url: https://github.com/tn823
     email: trnghia823@gmail.com
 servers:
-  - url: http://localhost:3000
+  - url: https://node-be-api.vercel.app
 
 tags:
   - name: Product
