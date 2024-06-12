@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
+const fs = require('fs');
 const { connectDB, sequelize } = require('../src/config/database');
 const productRoutes = require('../src/routes/product.routes');
 const categoryRoutes = require('../src/routes/category.routes');
@@ -27,8 +28,15 @@ app.use('/api', productRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', accountRoutes);
 
-const swaggerDocument = YAML.load("swagger.yaml");
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+fs.readFile('swagger.yaml', 'utf8', (err, data) => {
+  if (err) {
+    console.error('No such file swagger.yaml:', err);
+    return;
+  }
+  const swaggerDocument = YAML.parse(data);
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+});
+
 
 app.get('/', (req, res) => {
     res.send('Welcome to the F&B Order API');
