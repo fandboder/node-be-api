@@ -27,7 +27,7 @@ app.use('/api', productRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', accountRoutes);
 
-const swaggerDocument = YAML.load("/swagger.yaml");
+const swaggerDocument = YAML.load("swagger.yaml");
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/', (req, res) => {
