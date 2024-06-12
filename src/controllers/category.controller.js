@@ -1,9 +1,10 @@
 const Category = require('../models/categoty.model')
+const CategoriesService = require('../services/category.service');
 
-// Retrieve all categories
-exports.getAllCategorise = async (req, res) => {
+
+exports.getAllCategories = async (req, res) => {
     try {
-        const categories = await Category.findAll();
+        const categories = await CategoriesService.getAllCategories(req.body);
         res.json(categories);
     } catch (error) {
         console.error('Error while getting categories:', error);
