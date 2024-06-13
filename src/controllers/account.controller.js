@@ -14,7 +14,7 @@ exports.addAccount = async (req, res) => {
     try {
         const { username, password, position } = req.body;
         const newAccount = await Account.create({ username, password, position });
-        res.status(201).json({ message: 'Add account seccess', account: newAccount });
+        res.status(201).json({ message: 'Add account success', account: newAccount });
     } catch (error) {
         console.error('Error while adding account: ', error);
         res.status(404).json({ error: 'Error while adding account' });
@@ -28,7 +28,7 @@ exports.deleteAccount = async (req, res) => {
         if (deleteAccount) {
             res.status(200).json({ message: 'Account deleted successfully' });
         } else {
-            res.status(404).json({ error: 'Account not fuond' });
+            res.status(404).json({ error: 'Account not found' });
         }
     } catch (error) {
         console.error('Error while deleting account: ', error);

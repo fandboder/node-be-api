@@ -1,7 +1,6 @@
 const Category = require('../models/categoty.model')
 
-// Retrieve all categories
-exports.getAllCategorise = async (req, res) => {
+exports.getAllCategories = async (req, res) => {
     try {
         const categories = await Category.findAll();
         res.json(categories);
@@ -11,19 +10,17 @@ exports.getAllCategorise = async (req, res) => {
     }
 }
 
-// Add a new category
 exports.addCategory = async (req, res) => {
     try {
         const { name } = req.body;
         const newCategory = await Category.create({ name });
-        res.status(201).json({ message: 'Category added seccessfully', category: newCategory });
+        res.status(201).json({ message: 'Category added successfully', category: newCategory });
     } catch (error) {
         console.error('Error while adding category: ', error);
         res.status(500).json({ error: 'Error while adding category' });
     }
 }
 
-//Delete a category
 exports.deleteCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
@@ -39,7 +36,6 @@ exports.deleteCategory = async (req, res) => {
     }
 };
 
-//Update a category
 exports.updateCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
