@@ -13,11 +13,14 @@ example:
 ## 🗄 Start
 
 example:
-1. Install package
-2. copy .env.sample to .env and edit values variables
-3. Start:
+1. build container docker
+2. setup database
+3. Install package
+4. Start:
 
 ```
+  docker compose build
+  docker compose up
   npm i
   npm run dev
 ```
