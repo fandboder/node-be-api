@@ -1,9 +1,18 @@
 const Product = require("../models/product.model.js");
+const ProductImage = require('../models/productImage.model.js');
 const { Op } = require("sequelize");
+
+Product.hasMany(ProductImage, { foreignKey: 'product_id' });
+ProductImage.belongsTo(Product, { foreignKey: 'product_id' });
 
 exports.getAllProducts = async (req, res) => {
     try {
-        const products = await Product.findAll();
+        const products = await Product.findAll({
+            include: [{
+                model: ProductImage,
+                attributes: ['url']
+            }]
+        });
         res.json(products);
     } catch (error) {
         console.error('Error while getting products: ', error);
@@ -13,18 +22,18 @@ exports.getAllProducts = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
     try {
-        const { name, description, price, category_id, img } = req.body;
-        const newProduct = await Product.create({
-            name,
-            description,
-            price,
-            category_id,
-            img
-        });
-        res.status(201).json({ message: "Thêm sản phẩm thành công !" });
+        const { name, description, price, category_id, images } = req.body;
+        const newProduct = await Product.create({ name, description, price, category_id });
+        if (images && images.length > 0) {
+            const productImages = images.map(url => ({ product_id: newProduct.id, url }));
+            await ProductImage.bulkCreate(productImages);
+        }
+
+        res.status(201).json(newProduct);
+
     } catch (error) {
-        console.error('Error while creating product:', error);
-        res.status(500).json({ error: 'Error while creating product' });
+        console.error('Lỗi khi tạo sản phẩm:', error);
+        res.status(500).json({ error: 'Lỗi khi tạo sản phẩm' });
     }
 };
 
