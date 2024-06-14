@@ -1,8 +1,15 @@
 openapi: 3.0.0
 info:
   title: FNB API
-  description: API for managing products with Swagger
+  description: >
+    **API for managing products with Swagger**
+
+    Developed by **tn823**
   version: 1.0.0
+  contact:
+    name: Nguyễn Trọng Nghĩa
+    url: https://github.com/tn823
+    email: trnghia823@gmail.com
 servers:
   - url: http://localhost:3000
 
@@ -11,6 +18,8 @@ tags:
     description: Everything about your Products
   - name: Category
     description: Product Category
+  - name: Account
+    description: Account List
 
 paths:
   /api/getProducts:
@@ -33,10 +42,105 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/getProducts/{id}:
+    get:
+      summary: Get product by ID
+      tags:
+        - Product
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the product to get
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/getProducts/name/{name}:
+    get:
+      summary: Get product by name
+      tags:
+        - Product
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          description: The name of the product to get
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/getProducts/category/{categoryId}:
+    get:
+      summary: Get products by category ID
+      tags:
+        - Product
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: integer
+          description: The ID of the category to get products for
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+        "404":
+          description: No products found in this category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/addProduct:
     post:
       tags:
-          - Product
+        - Product
       summary: Create a new product
       requestBody:
         required: true
@@ -51,10 +155,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Message"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/deleteProduct/{id}:
     delete:
       tags:
-          - Product
+        - Product
       summary: Delete a product by ID
       parameters:
         - in: path
@@ -75,17 +185,17 @@ paths:
           content:
             application/json:
               schema:
-                message: Sản phẩm không tồn tại
+                $ref: "#/components/schemas/Error"
         "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                message: Error while deleting product
+                $ref: "#/components/schemas/Error"
   /api/updateProduct/{id}:
     put:
       tags:
-          - Product
+        - Product
       summary: Update a product by ID
       parameters:
         - in: path
@@ -119,11 +229,240 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/getCategories:
+    get:
+      summary: Get all category name
+      tags:
+        - Category
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/addCategory:
+    post:
+      tags:
+        - Category
+      summary: Create a new category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '201':
+          description: The created category
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/deleteCategory/{id}:
+    delete:
+      tags:
+        - Category
+      summary: Delete a category by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the category to delete
+      responses:
+        '200':
+          description: Category deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/updateCategory/{id}:
+    put:
+      tags:
+        - Category
+      summary: Update a category by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the category to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/getAccounts:
+    get:
+      summary: Get all accounts
+      tags:
+        - Account
+      responses:
+        "200":
+          description: A list of accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Account"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/addAccount:
+    post:
+      summary: Create a new account
+      tags:
+        - Account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountInput'
+      responses:
+        "201":
+          description: The created account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/deleteAccount/{id}:
+    delete:
+      tags:
+        - Account
+      summary: Delete an account by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the account to delete
+      responses:
+        "200":
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/updateAccount/{id}:
+    put:
+      tags:
+        - Account
+      summary: Update an account by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the account to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountInput' # Thay thế bằng schema tương ứng nếu cần
+      responses:
+        "200":
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
 components:
   schemas:
     Product:
       type: object
       properties:
+        product_id:
+          type: integer
+          description: ID của sản phẩm
         name:
           type: string
         description:
@@ -135,11 +474,13 @@ components:
         img:
           type: string
       example:
-        name: Name
-        description: Description
-        price: 100
+        product_id: 1
+        name: Example Product
+        description: This is an example product
+        price: 100.0
         category_id: 1
         img: https://example.com/product.jpg
+
     ProductInput:
       type: object
       required:
@@ -160,11 +501,80 @@ components:
         img:
           type: string
       example:
-        name: Name
-        description: Description
-        price: 100
+        name: Example Product
+        description: This is an example product
+        price: 100.0
         category_id: 1
         img: https://example.com/product.jpg
+
+    Category:
+      type: object
+      properties:
+        category_id:
+          type: integer
+          description: ID của danh mục
+        name:
+          type: string
+          description: Tên của danh mục
+      example:
+        category_id: 1
+        name: Example Category
+
+    CategoryInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Tên của danh mục
+      example:
+        name: New Category
+
+    Account:
+      type: object
+      properties:
+        account_id:
+          type: integer
+          description: ID account
+        username:
+          type: string
+          description: Your username
+        password:
+          type: string
+          description: Your password
+        position:
+          type: string
+          description: Your account positon
+
+      example:
+        account_id: 1
+        username: admin
+        password: 123
+        position: admin
+
+    AccountInput:
+      type: object
+      required:
+        - username
+        - password
+        - position
+      properties:
+        username:
+          type: string
+          description: Username of the account
+        password:
+          type: string
+          description: Password of the account
+        position:
+          type: string
+          description: Position of the account
+      example:
+        username: username
+        password: password
+        position: position
+
+
     Message:
       type: object
       properties:
@@ -172,6 +582,7 @@ components:
           type: string
       example:
         message: Operation successful
+
     Error:
       type: object
       properties:
