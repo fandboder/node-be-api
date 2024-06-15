@@ -42,7 +42,7 @@ exports.deleteProduct = async (req, res) => {
         const productId = req.params.id;
         const deletedProduct = await Product.destroy({
             where: {
-                product_id: productId
+                id: productId
             }
         });
         if (deletedProduct) {
@@ -59,10 +59,10 @@ exports.deleteProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
     try {
         const productId = req.params.id;
-        const { name, description, price, category_id, img } = req.body;
+        const { name, description, price, category_id, images } = req.body;
         const [updated] = await Product.update(
-            { name, description, price, category_id, img },
-            { where: { product_id: productId } }
+            { name, description, price, category_id, images },
+            { where: { id: productId } }
         );
         if (updated) {
             res.json({ message: 'Sửa thông tin sản phẩm thành công' });
@@ -77,7 +77,14 @@ exports.updateProduct = async (req, res) => {
 
 exports.getProductById = async (req, res) => {
     try {
-        const product = await Product.findByPk(req.params.id);
+        const productId = req.params.id;
+        const product = await Product.findOne({
+            where: { id: productId },
+            include: [{
+                model: ProductImage,
+                attributes: ['url']
+            }]
+        });
         if (product) {
             res.json(product);
         } else {
@@ -93,7 +100,16 @@ exports.getProductById = async (req, res) => {
 exports.getProductsByCategory = async (req, res) => {
     try {
         const categoryId = req.params.categoryId;
-        const products = await Product.findAll({ where: { category_id: categoryId } });
+        const products = await Product.findAll({
+            where:
+            {
+                category_id: categoryId
+            },
+            include: [{
+                model: ProductImage,
+                attributes: ['url']
+            }]
+        });
         if (products.length > 0) {
             res.json(products);
         } else {
@@ -114,7 +130,11 @@ exports.getProductByName = async (req, res) => {
                 name: {
                     [Op.like]: `%${name}%`
                 }
-            }
+            },
+            include: [{
+                model: ProductImage,
+                attributes: ['url']
+            }]
         });
         if (product.length > 0) {
             res.json(product);
