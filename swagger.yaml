@@ -520,26 +520,35 @@ components:
     Category:
       type: object
       properties:
-        category_id:
+        id:
           type: integer
-          description: ID của danh mục
+          description: ID category
         name:
           type: string
-          description: Tên của danh mục
+          description: Name category
+        parent_id:
+          type: interger
+          description: New parent_id
       example:
-        category_id: 1
+        id: 1
         name: Example Category
+        parent_id: 1
 
     CategoryInput:
       type: object
       required:
         - name
+        - parent_id
       properties:
         name:
           type: string
-          description: Tên của danh mục
+          description: name category
+        parent_id:
+          type: integer
+          description: parent_id
       example:
         name: New Category
+        parent_id: 1
 
     Account:
       type: object
