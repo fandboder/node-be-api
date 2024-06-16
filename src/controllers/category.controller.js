@@ -12,8 +12,8 @@ exports.getAllCategories = async (req, res) => {
 
 exports.addCategory = async (req, res) => {
     try {
-        const { name, parent_id } = req.body;
-        const newCategory = await Category.create({ name, parent_id });
+        const { name, menu_id } = req.body;
+        const newCategory = await Category.create({ name, menu_id });
         res.status(201).json({ message: 'Category added successfully', category: newCategory });
     } catch (error) {
         console.error('Error while adding category: ', error);

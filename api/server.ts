@@ -10,7 +10,7 @@ const { connectDB, sequelize } = require('../src/config/database');
 const productRoutes = require('../src/routes/product.routes');
 const categoryRoutes = require('../src/routes/category.routes');
 const accountRoutes = require('../src/routes/account.routes');
-
+const menuRoutes = require('../src/routes/menu.routes');
 
 dotenv.config();
 
@@ -27,6 +27,8 @@ app.use(express.json());
 app.use('/api', productRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', accountRoutes);
+app.use('/api', menuRoutes);
+
 
 fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   if (err) {

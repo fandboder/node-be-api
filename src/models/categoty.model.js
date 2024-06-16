@@ -11,7 +11,7 @@ const Category = sequelize.define('Category', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    parent_id: {
+    menu_id: {
         type: DataTypes.INTEGER,
         allowNull: false
     }

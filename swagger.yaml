@@ -19,8 +19,11 @@ tags:
     description: Everything about your Products
   - name: Category
     description: Product Category
+  - name: Menu
+    description: Menu Mcdonald
   - name: Account
     description: Account List
+
 
 paths:
   /api/getProducts:
@@ -342,6 +345,167 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  paths:
+  /api/getMenus:
+    get:
+      tags:
+        - Menu
+      summary: Get all menus
+      responses:
+        "200":
+          description: A list of menus
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Menu"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/addMenu:
+    post:
+      summary: Create a new menu
+      tags:
+        - Menu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '201':
+          description: Menu created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  menu:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+        '500':
+          description: Error while creating menu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /api/deleteMenu/{id}:
+    delete:
+      summary: Delete a menu by ID
+      tags:
+        - Menu
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the menu to delete
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Menu deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Menu not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Error while deleting menu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /api/updateMenu/{id}:
+    put:
+      summary: Update a menu by ID
+      tags:
+        - Menu
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the menu to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '200':
+          description: Menu updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  menu:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+        '404':
+          description: Menu not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Error while updating menu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
   /api/getAccounts:
     get:
       summary: Get all accounts
@@ -526,29 +690,43 @@ components:
         name:
           type: string
           description: Name category
-        parent_id:
+        menu_id:
           type: interger
-          description: New parent_id
+          description: New menu_id
       example:
         id: 1
         name: Example Category
-        parent_id: 1
+        menu_: 1
 
     CategoryInput:
       type: object
       required:
         - name
-        - parent_id
+        - menu_id
       properties:
         name:
           type: string
           description: name category
-        parent_id:
+        menu_id:
           type: integer
-          description: parent_id
+          description: menu_id
       example:
         name: New Category
-        parent_id: 1
+        menu_id: 1
+
+    Menu:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID of the menu
+        name:
+          type: string
+          description: Name of the menu
+      example:
+        id: 1
+        name: Breakfast Menu
+
 
     Account:
       type: object
