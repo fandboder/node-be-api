@@ -13,8 +13,8 @@ exports.getAllCategories = async (req, res) => {
 
 exports.addCategory = async (req, res) => {
     try {
-        const { name } = req.body;
-        const newCategory = await Category.create({ name });
+        const { name, menu_id } = req.body;
+        const newCategory = await Category.create({ name, menu_id });
         res.status(201).json({ message: 'Category added successfully', category: newCategory });
     } catch (error) {
         console.error('Error while adding category: ', error);
@@ -25,7 +25,7 @@ exports.addCategory = async (req, res) => {
 exports.deleteCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
-        const result = await Category.destroy({ where: { category_id: categoryId } });
+        const result = await Category.destroy({ where: { id: categoryId } });
         if (result === 0) {
             res.status(404).json({ message: 'Category not found' });
         } else {
@@ -42,10 +42,10 @@ exports.updateCategory = async (req, res) => {
         const categoryId = req.params.id;
         const { name } = req.body;
 
-        const [updated] = await Category.update({ name }, { where: { category_id: categoryId } });
+        const [updated] = await Category.update({ name }, { where: { id: categoryId } });
 
         if (updated) {
-            const updatedCategory = await Category.findOne({ where: { category_id: categoryId } });
+            const updatedCategory = await Category.findOne({ where: { id: categoryId } });
             res.status(200).json({ message: 'Category updated successfully', data: updatedCategory });
         } else {
             res.status(404).json({ error: 'Category not found' });
