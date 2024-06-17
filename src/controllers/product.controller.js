@@ -40,12 +40,20 @@ exports.createProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
     try {
         const productId = req.params.id;
-        const deletedProduct = await Product.destroy({
+
+        await ProductImage.destroy({
+            where: {
+                product_id: productId
+            }
+        });
+
+        const deletedRows = await Product.destroy({
             where: {
                 id: productId
             }
         });
-        if (deletedProduct) {
+
+        if (deletedRows > 0) {
             res.json({ message: 'Xóa sản phẩm thành công' });
         } else {
             res.status(404).json({ error: 'Sản phẩm không tồn tại' });
