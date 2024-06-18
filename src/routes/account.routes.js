@@ -10,4 +10,6 @@ router.delete('/deleteAccount/:id', accountController.deleteAccount);
 
 router.put('/updateAccount/:id', accountController.updateAccount);
 
+router.post('/login', accountController.login);
+
 module.exports = router;

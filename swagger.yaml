@@ -23,7 +23,8 @@ tags:
     description: Menu Mcdonald
   - name: Account
     description: Account List
-
+  - name: Authentication
+    description: Login or Register Api
 
 paths:
   /api/getProducts:
@@ -618,6 +619,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/login:
+    post:
+      tags:
+        - Authentication
+      summary: "Login"
+      description: "User login"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  token:
+                    type: string
+        '401':
+          description: "Invalid password"
+        '404':
+          description: "Account not found"
 
 components:
   schemas:
@@ -770,6 +807,36 @@ components:
         username: username
         password: password
         position: position
+
+    Authentication:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Your username
+        password:
+          type: string
+          description: Your password
+      example:
+        username: admin
+        password: 123
+
+    AuthenticationInput:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: Username of the account
+        password:
+          type: string
+          description: Password of the account
+      example:
+        username: username
+        password: password
+
 
     Message:
       type: object

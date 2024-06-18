@@ -1,4 +1,5 @@
 const Account = require('../models/account.model');
+const jwt = require('jsonwebtoken')
 
 exports.getAllAccounts = async (req, res) => {
     try {
@@ -24,7 +25,7 @@ exports.addAccount = async (req, res) => {
 exports.deleteAccount = async (req, res) => {
     try {
         const { id } = req.params;
-        const deleteAccount = await Account.destroy({ where: { account_id: id } });
+        const deleteAccount = await Account.destroy({ where: { id: id } });
         if (deleteAccount) {
             res.status(200).json({ message: 'Account deleted successfully' });
         } else {
@@ -43,7 +44,7 @@ exports.updateAccount = async (req, res) => {
     try {
         const updatedAccount = await Account.update(
             { username, password, position },
-            { where: { account_id: accountId } }
+            { where: { id: accountId } }
         );
 
         if (updatedAccount[0] === 1) {
@@ -52,6 +53,28 @@ exports.updateAccount = async (req, res) => {
             res.status(404).json({ error: 'Account not found' });
         }
     } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+exports.login = async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const account = await Account.findOne({ where: { username: username } });
+        if (!account) {
+            return res.status(404).json({ error: 'Account not found' });
+        }
+        if (password !== account.password) {
+            return res.status(401).json({ error: 'Incorrect password' });
+        }
+        const token = jwt.sign(
+            { id: account.id, username: account.username, position: account.position },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+        res.status(200).json({ message: 'Login successful', token: token });
+    } catch (error) {
+        console.error('Error while logging in: ', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
