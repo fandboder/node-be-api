@@ -1,9 +1,18 @@
 const Product = require("../models/product.model.js");
+const ProductImage = require('../models/productImage.model.js');
 const { Op } = require("sequelize");
+
+Product.hasMany(ProductImage, { foreignKey: 'product_id' });
+ProductImage.belongsTo(Product, { foreignKey: 'product_id' });
 
 exports.getAllProducts = async (req, res) => {
     try {
-        const products = await Product.findAll();
+        const products = await Product.findAll({
+            include: [{
+                model: ProductImage,
+                attributes: ['url']
+            }]
+        });
         res.json(products);
     } catch (error) {
         console.error('Error while getting products: ', error);
@@ -13,30 +22,38 @@ exports.getAllProducts = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
     try {
-        const { name, description, price, category_id, img } = req.body;
-        const newProduct = await Product.create({
-            name,
-            description,
-            price,
-            category_id,
-            img
-        });
-        res.status(201).json({ message: "Thêm sản phẩm thành công !" });
+        const { name, description, price, category_id, images } = req.body;
+        const newProduct = await Product.create({ name, description, price, category_id });
+        if (images && images.length > 0) {
+            const productImages = images.map(url => ({ product_id: newProduct.id, url }));
+            await ProductImage.bulkCreate(productImages);
+        }
+
+        res.status(201).json(newProduct);
+
     } catch (error) {
-        console.error('Error while creating product:', error);
-        res.status(500).json({ error: 'Error while creating product' });
+        console.error('Lỗi khi tạo sản phẩm:', error);
+        res.status(500).json({ error: 'Lỗi khi tạo sản phẩm' });
     }
 };
 
 exports.deleteProduct = async (req, res) => {
     try {
         const productId = req.params.id;
-        const deletedProduct = await Product.destroy({
+
+        await ProductImage.destroy({
             where: {
                 product_id: productId
             }
         });
-        if (deletedProduct) {
+
+        const deletedRows = await Product.destroy({
+            where: {
+                id: productId
+            }
+        });
+
+        if (deletedRows > 0) {
             res.json({ message: 'Xóa sản phẩm thành công' });
         } else {
             res.status(404).json({ error: 'Sản phẩm không tồn tại' });
@@ -50,10 +67,10 @@ exports.deleteProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
     try {
         const productId = req.params.id;
-        const { name, description, price, category_id, img } = req.body;
+        const { name, description, price, category_id, images } = req.body;
         const [updated] = await Product.update(
-            { name, description, price, category_id, img },
-            { where: { product_id: productId } }
+            { name, description, price, category_id, images },
+            { where: { id: productId } }
         );
         if (updated) {
             res.json({ message: 'Sửa thông tin sản phẩm thành công' });
@@ -68,7 +85,14 @@ exports.updateProduct = async (req, res) => {
 
 exports.getProductById = async (req, res) => {
     try {
-        const product = await Product.findByPk(req.params.id);
+        const productId = req.params.id;
+        const product = await Product.findOne({
+            where: { id: productId },
+            include: [{
+                model: ProductImage,
+                attributes: ['url']
+            }]
+        });
         if (product) {
             res.json(product);
         } else {
@@ -84,7 +108,16 @@ exports.getProductById = async (req, res) => {
 exports.getProductsByCategory = async (req, res) => {
     try {
         const categoryId = req.params.categoryId;
-        const products = await Product.findAll({ where: { category_id: categoryId } });
+        const products = await Product.findAll({
+            where:
+            {
+                category_id: categoryId
+            },
+            include: [{
+                model: ProductImage,
+                attributes: ['url']
+            }]
+        });
         if (products.length > 0) {
             res.json(products);
         } else {
@@ -105,7 +138,11 @@ exports.getProductByName = async (req, res) => {
                 name: {
                     [Op.like]: `%${name}%`
                 }
-            }
+            },
+            include: [{
+                model: ProductImage,
+                attributes: ['url']
+            }]
         });
         if (product.length > 0) {
             res.json(product);

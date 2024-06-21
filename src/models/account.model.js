@@ -2,7 +2,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require('../config/database');
 
 const Account = sequelize.define('Account', {
-    account_id: {
+    id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true

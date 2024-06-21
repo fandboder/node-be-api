@@ -11,6 +11,7 @@ info:
     url: https://github.com/tn823
     email: trnghia823@gmail.com
 servers:
+  - url: http://localhost:3000/
   - url: https://node-be-api.vercel.app
 
 tags:
@@ -18,8 +19,12 @@ tags:
     description: Everything about your Products
   - name: Category
     description: Product Category
+  - name: Menu
+    description: Menu Mcdonald
   - name: Account
     description: Account List
+  - name: Authentication
+    description: Login or Register Api
 
 paths:
   /api/getProducts:
@@ -154,7 +159,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Message"
+                $ref: "#/components/schemas/Product"
         "500":
           description: Internal server error
           content:
@@ -216,7 +221,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Message"
+                $ref: "#/components/schemas/Product"
         "404":
           description: Product not found
           content:
@@ -266,7 +271,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
+                $ref: '#/components/schemas/Category'
         '500':
           description: Internal server error
           content:
@@ -328,7 +333,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
+                $ref: '#/components/schemas/Category'
         '404':
           description: Category not found
           content:
@@ -341,6 +346,167 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  paths:
+  /api/getMenus:
+    get:
+      tags:
+        - Menu
+      summary: Get all menus
+      responses:
+        "200":
+          description: A list of menus
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Menu"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/addMenu:
+    post:
+      summary: Create a new menu
+      tags:
+        - Menu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '201':
+          description: Menu created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  menu:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+        '500':
+          description: Error while creating menu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /api/deleteMenu/{id}:
+    delete:
+      summary: Delete a menu by ID
+      tags:
+        - Menu
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the menu to delete
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Menu deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Menu not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Error while deleting menu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /api/updateMenu/{id}:
+    put:
+      summary: Update a menu by ID
+      tags:
+        - Menu
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the menu to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '200':
+          description: Menu updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  menu:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+        '404':
+          description: Menu not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Error while updating menu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
   /api/getAccounts:
     get:
       summary: Get all accounts
@@ -378,7 +544,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
+                $ref: '#/components/schemas/Account'
         "500":
           description: Internal server error
           content:
@@ -433,14 +599,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AccountInput' # Thay thế bằng schema tương ứng nếu cần
+              $ref: '#/components/schemas/AccountInput'
       responses:
         "200":
           description: Account updated successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Message"
+                $ref: "#/components/schemas/Account"
         "404":
           description: Account not found
           content:
@@ -453,14 +619,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
+  /api/login:
+    post:
+      tags:
+        - Authentication
+      summary: "Login"
+      description: "User login"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  token:
+                    type: string
+        '401':
+          description: "Invalid password"
+        '404':
+          description: "Account not found"
 
 components:
   schemas:
     Product:
       type: object
       properties:
-        product_id:
+        id:
           type: integer
           description: ID của sản phẩm
         name:
@@ -471,15 +672,20 @@ components:
           type: number
         category_id:
           type: integer
-        img:
-          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
       example:
-        product_id: 1
+        id: 1
         name: Example Product
         description: This is an example product
         price: 100.0
         category_id: 1
-        img: https://example.com/product.jpg
+        images:
+          - https://example.com/image1.jpg
+          - https://example.com/image2.jpg
 
     ProductInput:
       type: object
@@ -488,7 +694,7 @@ components:
         - description
         - price
         - category_id
-        - img
+        - images
       properties:
         name:
           type: string
@@ -498,38 +704,66 @@ components:
           type: number
         category_id:
           type: integer
-        img:
-          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
       example:
-        name: Example Product
-        description: This is an example product
-        price: 100.0
+        name: New Product
+        description: This is a new product
+        price: 19.99
         category_id: 1
-        img: https://example.com/product.jpg
+        images:
+          - https://example.com/image1.jpg
+          - https://example.com/image2.jpg
 
     Category:
       type: object
       properties:
-        category_id:
+        id:
           type: integer
-          description: ID của danh mục
+          description: ID category
         name:
           type: string
-          description: Tên của danh mục
+          description: Name category
+        menu_id:
+          type: interger
+          description: New menu_id
       example:
-        category_id: 1
+        id: 1
         name: Example Category
+        menu_: 1
 
     CategoryInput:
       type: object
       required:
         - name
+        - menu_id
       properties:
         name:
           type: string
-          description: Tên của danh mục
+          description: name category
+        menu_id:
+          type: integer
+          description: menu_id
       example:
         name: New Category
+        menu_id: 1
+
+    Menu:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID of the menu
+        name:
+          type: string
+          description: Name of the menu
+      example:
+        id: 1
+        name: Breakfast Menu
+
 
     Account:
       type: object
@@ -573,6 +807,35 @@ components:
         username: username
         password: password
         position: position
+
+    Authentication:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Your username
+        password:
+          type: string
+          description: Your password
+      example:
+        username: admin
+        password: 123
+
+    AuthenticationInput:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: Username of the account
+        password:
+          type: string
+          description: Password of the account
+      example:
+        username: username
+        password: password
 
 
     Message:
