@@ -1,5 +1,4 @@
 const Category = require('../models/categoty.model')
-const CategoriesService = require('../services/category.service');
 
 exports.getAllCategories = async (req, res) => {
     try {
