@@ -1,4 +1,5 @@
 const Category = require('../models/categoty.model')
+const { Op } = require("sequelize");
 
 exports.getAllCategories = async (req, res) => {
     try {
@@ -55,3 +56,59 @@ exports.updateCategory = async (req, res) => {
     }
 };
 
+
+exports.getCategoryById = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const category = await Category.findByPk(categoryId);
+        if (!category) {
+            return res.status(404).json({ error: 'Category not found' });
+        }
+        res.status(201).json(category);
+    } catch (error) {
+        console.error('Error while getting category by id:', error);
+        res.status(500).json({ error: 'Error while getting category' });
+    }
+}
+
+exports.getCategoryByMenuId = async (req, res) => {
+    try {
+        const menuId = req.params.menuId;
+        const categories = await Category.findAll({
+            where: {
+                menu_id: menuId
+            }
+        });
+
+        if (categories.length === 0) {
+            return res.status(404).json({ error: 'Category not found' });
+        }
+
+        res.json(categories);
+    } catch (error) {
+        console.error('Error while getting category by menu_id:', error);
+        res.status(500).json({ error: 'Error while getting category by menu_id' });
+    }
+};
+
+exports.getCategoryByName = async (req, res) => {
+    try {
+        const name = req.params.name;
+        const categories = await Category.findAll({
+            where: {
+                name: {
+                    [Op.like]: `%${name}%`
+                }
+            }
+        });
+
+        if (categories.length === 0) {
+            return res.status(404).json({ error: 'Category not found' });
+        }
+
+        res.json(categories);
+    } catch (error) {
+        console.error('Error while getting category by name:', error);
+        res.status(500).json({ error: 'Error while getting category by name' });
+    }
+};
