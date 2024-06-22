@@ -3,13 +3,14 @@ const { Op } = require("sequelize");
 
 exports.getAllCategories = async (req, res) => {
     try {
-        const categories = await CategoriesService.getAllCategories(req.body);
+        const categories = await Category.findAll();
         res.json(categories);
     } catch (error) {
         console.error('Error while getting categories:', error);
         res.status(500).json({ error: 'Error while getting categories' });
     }
 }
+
 
 exports.addCategory = async (req, res) => {
     try {

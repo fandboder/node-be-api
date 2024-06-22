@@ -1,10 +1,11 @@
 const Category = require('../models/categoty.model')
 
-class CategoriesService {
-  async getAllCategories() {
-      const Categories = await Category.findAll();
-      return Categories;
-  }
+exports.getAllCategories = async () => {
+    try {
+        const categories = await Category.findAll();
+        return categories;
+    } catch (error) {
+        console.error('Error while getting categories:', error);
+        throw new Error('Error while getting categories');
+    }
 }
-
-module.exports = new CategoriesService();
