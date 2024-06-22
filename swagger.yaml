@@ -254,6 +254,104 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/getCategory/{id}:
+    get:
+      summary: Get a category by ID
+      tags:
+        - Category
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the category to retrieve
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/getCategories/name/{name}:
+    get:
+      summary: Get categories by name (partial match)
+      tags:
+        - Category
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          description: Name of the category to retrieve
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/getCategories/menu/{menuId}:
+    get:
+      summary: Get categories by menu ID
+      tags:
+        - Category
+      parameters:
+        - in: path
+          name: menuId
+          required: true
+          schema:
+            type: integer
+          description: Menu ID of the categories to retrieve
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/addCategory:
     post:
       tags:

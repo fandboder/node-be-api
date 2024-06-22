@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const Account = require('../models/account.model');
 const jwt = require('jsonwebtoken')
 
@@ -92,3 +93,25 @@ exports.getAccountById = async (req, res) => {
         res.status(500).json({ error: 'Error while getting account' });
     }
 };
+
+
+exports.getAccountsByUsername = async (req, res) => {
+    const { username } = req.params;
+
+    try {
+        const accounts = await Account.findAll({
+            where: {
+                username: {
+                    [Op.like]: `%${username}%`
+                }
+            }
+        });
+
+        res.status(200).json(accounts);
+    } catch (error) {
+        console.error('Error while getting accounts by username:', error);
+        res.status(500).json({ error: 'Error while getting accounts by username' });
+    }
+};
+
+

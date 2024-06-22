@@ -14,4 +14,6 @@ router.post('/login', accountController.login);
 
 router.get('/getAccount/:id', accountController.getAccountById);
 
+router.get('/getAccounts/username/:username', accountController.getAccountsByUsername);
+
 module.exports = router;
