@@ -12,4 +12,6 @@ router.put('/updateAccount/:id', accountController.updateAccount);
 
 router.post('/login', accountController.login);
 
+router.get('/getAccount/:id', accountController.getAccountById);
+
 module.exports = router;
