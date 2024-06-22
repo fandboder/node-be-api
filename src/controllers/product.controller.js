@@ -40,19 +40,16 @@ exports.createProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
     try {
         const productId = req.params.id;
-
         await ProductImage.destroy({
             where: {
                 product_id: productId
             }
         });
-
         const deletedRows = await Product.destroy({
             where: {
                 id: productId
             }
         });
-
         if (deletedRows > 0) {
             res.json({ message: 'Xóa sản phẩm thành công' });
         } else {
@@ -68,20 +65,30 @@ exports.updateProduct = async (req, res) => {
     try {
         const productId = req.params.id;
         const { name, description, price, category_id, images } = req.body;
-        const [updated] = await Product.update(
-            { name, description, price, category_id, images },
-            { where: { id: productId } }
-        );
-        if (updated) {
-            res.json({ message: 'Sửa thông tin sản phẩm thành công' });
-        } else {
-            res.status(404).json({ error: 'Sản phẩm không tồn tại' });
+
+        console.log('Received payload:', req.body);
+
+        const product = await Product.findByPk(productId);
+        if (!product) {
+            return res.status(404).json({ error: 'Sản phẩm không tồn tại' });
         }
+
+        await product.update({ name, description, price, category_id });
+
+        await ProductImage.destroy({ where: { product_id: productId } });
+
+        if (images && images.length > 0) {
+            const productImages = images.map(url => ({ product_id: productId, url }));
+            await ProductImage.bulkCreate(productImages);
+        }
+
+        res.json({ message: 'Sửa thông tin sản phẩm thành công' });
     } catch (error) {
         console.error('Error while updating product:', error);
         res.status(500).json({ error: 'Error while updating product' });
     }
 };
+
 
 exports.getProductById = async (req, res) => {
     try {
@@ -121,7 +128,7 @@ exports.getProductsByCategory = async (req, res) => {
         if (products.length > 0) {
             res.json(products);
         } else {
-            res.status(404).json({ error: 'No Products found in this category' });
+            res.status(404).json({ error: 'Product not found' });
         }
     } catch (error) {
         console.error('Error while getting products by category: ', error);
