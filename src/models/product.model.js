@@ -25,6 +25,14 @@ const Product = sequelize.define('Product', {
             model: 'categories',
             key: 'id'
         }
+    },
+    created_at: {
+        type: DataTypes.DATE(3),
+        allowNull: true
+    },
+    updated_at: {
+        type: DataTypes.DATE(3),
+        allowNull: true
     }
 }, {
     tableName: 'products',

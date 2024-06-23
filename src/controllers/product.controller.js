@@ -1,6 +1,7 @@
 const Product = require("../models/product.model.js");
 const ProductImage = require('../models/productImage.model.js');
 const { Op } = require("sequelize");
+const moment = require('moment-timezone');
 
 Product.hasMany(ProductImage, { foreignKey: 'product_id' });
 ProductImage.belongsTo(Product, { foreignKey: 'product_id' });
@@ -10,7 +11,7 @@ exports.getAllProducts = async (req, res) => {
         const products = await Product.findAll({
             include: [{
                 model: ProductImage,
-                attributes: ['url']
+                attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at']
             }]
         });
         res.json(products);
@@ -23,9 +24,13 @@ exports.getAllProducts = async (req, res) => {
 exports.createProduct = async (req, res) => {
     try {
         const { name, description, price, category_id, images } = req.body;
-        const newProduct = await Product.create({ name, description, price, category_id });
+
+        const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh');
+        const currentTimeUTCF = currentTimeVN.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+
+        const newProduct = await Product.create({ name, description, price, category_id, created_at: currentTimeUTCF, updated_at: currentTimeUTCF });
         if (images && images.length > 0) {
-            const productImages = images.map(url => ({ product_id: newProduct.id, url }));
+            const productImages = images.map(url => ({ product_id: newProduct.id, url, created_at: currentTimeUTCF, updated_at: currentTimeUTCF }));
             await ProductImage.bulkCreate(productImages);
         }
 

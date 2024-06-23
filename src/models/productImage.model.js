@@ -18,6 +18,14 @@ const ProductImage = sequelize.define('ProductImage', {
     url: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    created_at: {
+        type: DataTypes.DATE(3),
+        allowNull: true
+    },
+    updated_at: {
+        type: DataTypes.DATE(3),
+        allowNull: true
     }
 }, {
     tableName: 'product_images',
