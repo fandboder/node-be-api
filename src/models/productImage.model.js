@@ -26,6 +26,10 @@ const ProductImage = sequelize.define('ProductImage', {
     updated_at: {
         type: DataTypes.DATE(3),
         allowNull: true
+    },
+    position: {
+        type: DataTypes.INTEGER,
+        allowNull: true
     }
 }, {
     tableName: 'product_images',

@@ -11,7 +11,7 @@ exports.getAllProducts = async (req, res) => {
         const products = await Product.findAll({
             include: [{
                 model: ProductImage,
-                attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at']
+                attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
             }]
         });
         res.json(products);
@@ -30,7 +30,7 @@ exports.createProduct = async (req, res) => {
 
         const newProduct = await Product.create({ name, description, price, category_id, created_at: currentTimeUTCF, updated_at: currentTimeUTCF });
         if (images && images.length > 0) {
-            const productImages = images.map(url => ({ product_id: newProduct.id, url, created_at: currentTimeUTCF, updated_at: currentTimeUTCF }));
+            const productImages = images.map(image => ({ product_id: newProduct.id, url: image.url, position: image.position, created_at: currentTimeUTCF, updated_at: currentTimeUTCF }));
             await ProductImage.bulkCreate(productImages);
         }
 
@@ -70,7 +70,6 @@ exports.updateProduct = async (req, res) => {
     try {
         const productId = req.params.id;
         const { name, description, price, category_id, images } = req.body;
-
         console.log('Received payload:', req.body);
 
         const product = await Product.findByPk(productId);
@@ -78,21 +77,64 @@ exports.updateProduct = async (req, res) => {
             return res.status(404).json({ error: 'Sản phẩm không tồn tại' });
         }
 
-        await product.update({ name, description, price, category_id });
+        const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh');
+        const currentTimeUTCF = currentTimeVN.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
-        await ProductImage.destroy({ where: { product_id: productId } });
+        await product.update({ name, description, price, category_id, updated_at: currentTimeUTCF });
+
+        const currentImages = await ProductImage.findAll({ where: { product_id: productId } });
 
         if (images && images.length > 0) {
-            const productImages = images.map(url => ({ product_id: productId, url }));
-            await ProductImage.bulkCreate(productImages);
+            const existingUrls = currentImages.map(img => img.url);
+
+            for (let { url, position } of images) {
+                const existingImage = currentImages.find(img => img.url === url);
+
+                if (existingImage) {
+                    if (existingImage.position !== position) {
+                        const imageToSwap = currentImages.find(img => img.position === position);
+
+                        if (imageToSwap) {
+                            await imageToSwap.update({ position: existingImage.position, updated_at: currentTimeUTCF });
+                        }
+
+                        await existingImage.update({ position, updated_at: currentTimeUTCF });
+                    } else {
+                        await existingImage.update({ updated_at: currentTimeUTCF });
+                    }
+                } else {
+                    if (position === 1) {
+                        await Promise.all(
+                            currentImages.map(async (img) => {
+                                if (img.position >= 1) {
+                                    await img.update({ position: img.position + 1, updated_at: currentTimeUTCF });
+                                }
+                            })
+                        );
+                    }
+
+                    await ProductImage.create({
+                        product_id: productId,
+                        url,
+                        created_at: currentTimeUTCF,
+                        updated_at: currentTimeUTCF,
+                        position
+                    });
+                }
+            }
         }
 
-        res.json({ message: 'Sửa thông tin sản phẩm thành công' });
+        const updatedProduct = await Product.findByPk(productId, {
+            include: [{ model: ProductImage, as: 'ProductImages' }]
+        });
+
+        res.json({ updatedProduct });
     } catch (error) {
         console.error('Error while updating product:', error);
         res.status(500).json({ error: 'Error while updating product' });
     }
 };
+
 
 
 exports.getProductById = async (req, res) => {
@@ -102,7 +144,7 @@ exports.getProductById = async (req, res) => {
             where: { id: productId },
             include: [{
                 model: ProductImage,
-                attributes: ['url']
+                attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
             }]
         });
         if (product) {
@@ -127,7 +169,7 @@ exports.getProductsByCategory = async (req, res) => {
             },
             include: [{
                 model: ProductImage,
-                attributes: ['url']
+                attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
             }]
         });
         if (products.length > 0) {
@@ -153,7 +195,7 @@ exports.getProductByName = async (req, res) => {
             },
             include: [{
                 model: ProductImage,
-                attributes: ['url']
+                attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
             }]
         });
         if (product.length > 0) {
