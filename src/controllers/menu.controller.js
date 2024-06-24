@@ -1,4 +1,5 @@
 const Menu = require('../models/menu.model');
+const moment = require('moment-timezone');
 
 exports.getMenus = async (req, res) => {
     try {
@@ -12,9 +13,12 @@ exports.getMenus = async (req, res) => {
 
 
 exports.createMenu = async (req, res) => {
-    const { name } = req.body;
     try {
-        const newMenu = await Menu.create({ name });
+        const { name } = req.body;
+        const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh');
+        const currentTimeUTCF = currentTimeVN.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+
+        const newMenu = await Menu.create({ name, created_at: currentTimeUTCF, updated_at: currentTimeUTCF });
         res.status(200).json({ message: 'Menu created successfull', menu: newMenu });
     } catch (error) {
         console.error('Error while creating menu:', error);
@@ -46,7 +50,11 @@ exports.updateMenu = async (req, res) => {
         if (!menu) {
             return res.status(404).json({ error: 'Menu not found' });
         }
+        const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh');
+        const currentTimeUTCF = currentTimeVN.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+
         menu.name = name;
+        menu.updated_at = currentTimeUTCF;
         await menu.save();
         res.json({ message: 'Menu update successfully' });
     } catch (error) {

@@ -2,17 +2,29 @@ const Product = require("../models/product.model.js");
 const ProductImage = require('../models/productImage.model.js');
 const { Op } = require("sequelize");
 const moment = require('moment-timezone');
+const Category = require("../models/categoty.model.js");
+const Menu = require("../models/menu.model.js");
 
 Product.hasMany(ProductImage, { foreignKey: 'product_id' });
 ProductImage.belongsTo(Product, { foreignKey: 'product_id' });
+Category.belongsTo(Menu, { foreignKey: 'menu_id' });
+Product.belongsTo(Category, { foreignKey: 'category_id' });
 
 exports.getAllProducts = async (req, res) => {
     try {
         const products = await Product.findAll({
             include: [{
+                model: Category,
+                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
+                include: {
+                    model: Menu,
+                    attributes: ['id', 'name', 'created_at', 'updated_at']
+                }
+            }, {
                 model: ProductImage,
                 attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }]
+            }
+            ]
         });
         res.json(products);
     } catch (error) {
@@ -85,8 +97,6 @@ exports.updateProduct = async (req, res) => {
         const currentImages = await ProductImage.findAll({ where: { product_id: productId } });
 
         if (images && images.length > 0) {
-            const existingUrls = currentImages.map(img => img.url);
-
             for (let { url, position } of images) {
                 const existingImage = currentImages.find(img => img.url === url);
 
@@ -103,16 +113,6 @@ exports.updateProduct = async (req, res) => {
                         await existingImage.update({ updated_at: currentTimeUTCF });
                     }
                 } else {
-                    if (position === 1) {
-                        await Promise.all(
-                            currentImages.map(async (img) => {
-                                if (img.position >= 1) {
-                                    await img.update({ position: img.position + 1, updated_at: currentTimeUTCF });
-                                }
-                            })
-                        );
-                    }
-
                     await ProductImage.create({
                         product_id: productId,
                         url,
@@ -143,6 +143,13 @@ exports.getProductById = async (req, res) => {
         const product = await Product.findOne({
             where: { id: productId },
             include: [{
+                model: Category,
+                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
+                include: {
+                    model: Menu,
+                    attributes: ['id', 'name', 'created_at', 'updated_at']
+                }
+            }, {
                 model: ProductImage,
                 attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
             }]
@@ -168,9 +175,17 @@ exports.getProductsByCategory = async (req, res) => {
                 category_id: categoryId
             },
             include: [{
+                model: Category,
+                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
+                include: {
+                    model: Menu,
+                    attributes: ['id', 'name', 'created_at', 'updated_at']
+                }
+            }, {
                 model: ProductImage,
                 attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }]
+            }
+            ]
         });
         if (products.length > 0) {
             res.json(products);
@@ -194,9 +209,17 @@ exports.getProductByName = async (req, res) => {
                 }
             },
             include: [{
+                model: Category,
+                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
+                include: {
+                    model: Menu,
+                    attributes: ['id', 'name', 'created_at', 'updated_at']
+                }
+            }, {
                 model: ProductImage,
                 attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }]
+            }
+            ]
         });
         if (product.length > 0) {
             res.json(product);
