@@ -869,6 +869,23 @@ components:
             position: 1
           - url: https://example.com/image2.jpg
             position: 2
+    ProductImage:
+      type: object
+      properties:
+        id:
+          type: integer
+        product_id:
+          type: integer
+        url:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        position:
+          type: integer
 
     Category:
       type: object
