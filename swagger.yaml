@@ -451,20 +451,21 @@ paths:
         - Menu
       summary: Get all menus
       responses:
-        "200":
+        '200':
           description: A list of menus
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Menu"
-        "500":
+                  $ref: '#/components/schemas/Menu'
+        '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
+
   /api/addMenu:
     post:
       summary: Create a new menu
@@ -481,6 +482,8 @@ paths:
                   type: string
               required:
                 - name
+            example:
+              name: New Menu
       responses:
         '201':
           description: Menu created successfully
@@ -492,21 +495,19 @@ paths:
                   message:
                     type: string
                   menu:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                      name:
-                        type: string
+                    $ref: '#/components/schemas/Menu'
+                example:
+                  message: Menu created successfully
+                  menu:
+                    id: 1
+                    name: New Menu
         '500':
           description: Error while creating menu
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+                $ref: '#/components/schemas/Error'
+
   /api/deleteMenu/{id}:
     delete:
       summary: Delete a menu by ID
@@ -529,24 +530,21 @@ paths:
                 properties:
                   message:
                     type: string
+                example:
+                  message: Menu deleted successfully
         '404':
           description: Menu not found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+                $ref: '#/components/schemas/Error'
         '500':
           description: Error while deleting menu
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+                $ref: '#/components/schemas/Error'
+
   /api/updateMenu/{id}:
     put:
       summary: Update a menu by ID
@@ -570,6 +568,8 @@ paths:
                   type: string
               required:
                 - name
+            example:
+              name: Updated Menu
       responses:
         '200':
           description: Menu updated successfully
@@ -581,30 +581,24 @@ paths:
                   message:
                     type: string
                   menu:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                      name:
-                        type: string
+                    $ref: '#/components/schemas/Menu'
+                example:
+                  message: Menu updated successfully
+                  menu:
+                    id: 1
+                    name: Updated Menu
         '404':
           description: Menu not found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+                $ref: '#/components/schemas/Error'
         '500':
           description: Error while updating menu
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+                $ref: '#/components/schemas/Error'
   /api/getAccounts:
     get:
       summary: Get all accounts
@@ -802,20 +796,39 @@ components:
           type: number
         category_id:
           type: integer
+        created_at:
+          type: string
+          format: date-time
+          description: Thời gian tạo sản phẩm (ISO 8601 format)
+        updated_at:
+          type: string
+          format: date-time
+          description: Thời gian cập nhật sản phẩm (ISO 8601 format)
         images:
           type: array
           items:
-            type: string
-            format: uri
+            $ref: "#/components/schemas/ProductImage"
       example:
         id: 1
         name: Example Product
         description: This is an example product
         price: 100.0
         category_id: 1
+        created_at: 2024-06-23T20:16:43.507Z
+        updated_at: 2024-06-23T20:16:43.507Z
         images:
-          - https://example.com/image1.jpg
-          - https://example.com/image2.jpg
+          - id: 1
+            product_id: 1
+            url: https://example.com/image1.jpg
+            created_at: 2024-06-23T20:16:43.507Z
+            updated_at: 2024-06-23T20:16:43.507Z
+            position: 1
+          - id: 2
+            product_id: 1
+            url: https://example.com/image2.jpg
+            created_at: 2024-06-23T20:16:43.507Z
+            updated_at: 2024-06-23T20:16:43.507Z
+            position: 2
 
     ProductInput:
       type: object
@@ -837,16 +850,25 @@ components:
         images:
           type: array
           items:
-            type: string
-            format: uri
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: Đường dẫn URL của hình ảnh
+              position:
+                type: integer
+                description: Vị trí của hình ảnh trong sản phẩm
       example:
         name: New Product
         description: This is a new product
         price: 19.99
         category_id: 1
         images:
-          - https://example.com/image1.jpg
-          - https://example.com/image2.jpg
+          - url: https://example.com/image1.jpg
+            position: 1
+          - url: https://example.com/image2.jpg
+            position: 2
 
     Category:
       type: object
@@ -893,7 +915,8 @@ components:
       example:
         id: 1
         name: Breakfast Menu
-
+        created_at: "2024-06-24T12:49:52.106Z"
+        updated_at: "2024-06-24T12:49:52.106Z"
 
     Account:
       type: object

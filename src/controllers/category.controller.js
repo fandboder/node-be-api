@@ -1,9 +1,17 @@
-const Category = require('../models/categoty.model')
+const { model } = require('mongoose');
+const Category = require('../models/categoty.model');
 const { Op } = require("sequelize");
+const Menu = require('../models/menu.model');
+const moment = require('moment-timezone');
 
 exports.getAllCategories = async (req, res) => {
     try {
-        const categories = await Category.findAll();
+        const categories = await Category.findAll({
+            include: {
+                model: Menu,
+                attributes: ['id', 'name', 'created_at', 'updated_at']
+            }
+        });
         res.json(categories);
     } catch (error) {
         console.error('Error while getting categories:', error);
@@ -15,7 +23,8 @@ exports.getAllCategories = async (req, res) => {
 exports.addCategory = async (req, res) => {
     try {
         const { name, menu_id } = req.body;
-        const newCategory = await Category.create({ name, menu_id });
+        const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+        const newCategory = await Category.create({ name, menu_id, created_at: currentTimeVN, updated_at: currentTimeVN });
         res.status(201).json({ message: 'Category added successfully', category: newCategory });
     } catch (error) {
         console.error('Error while adding category: ', error);
@@ -41,12 +50,13 @@ exports.deleteCategory = async (req, res) => {
 exports.updateCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
-        const { name } = req.body;
+        const { name, menu_id } = req.body;
 
-        const [updated] = await Category.update({ name }, { where: { id: categoryId } });
+        const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+        const [updated] = await Category.update({ name, menu_id, updated_at: currentTimeVN }, { where: { id: categoryId } });
 
         if (updated) {
-            const updatedCategory = await Category.findOne({ where: { id: categoryId } });
+            const updatedCategory = await Category.findByPk(categoryId);
             res.status(200).json({ message: 'Category updated successfully', data: updatedCategory });
         } else {
             res.status(404).json({ error: 'Category not found' });
@@ -61,7 +71,12 @@ exports.updateCategory = async (req, res) => {
 exports.getCategoryById = async (req, res) => {
     try {
         const categoryId = req.params.id;
-        const category = await Category.findByPk(categoryId);
+        const category = await Category.findByPk(categoryId, {
+            include: {
+                model: Menu,
+                attributes: ['id', 'name', 'created_at', 'updated_at']
+            }
+        });
         if (!category) {
             return res.status(404).json({ error: 'Category not found' });
         }
@@ -78,6 +93,10 @@ exports.getCategoryByMenuId = async (req, res) => {
         const categories = await Category.findAll({
             where: {
                 menu_id: menuId
+            },
+            include: {
+                model: Menu,
+                attributes: ['id', 'name', 'created_at', 'updated_at']
             }
         });
 
@@ -100,6 +119,10 @@ exports.getCategoryByName = async (req, res) => {
                 name: {
                     [Op.like]: `%${name}%`
                 }
+            },
+            include: {
+                model: Menu,
+                attributes: ['id', 'name', 'created_at', 'updated_at']
             }
         });
 
