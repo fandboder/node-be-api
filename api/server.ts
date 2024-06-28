@@ -19,11 +19,20 @@ connectDB();
 const app = express();
 const port = process.env.PORT || 3000;
 
+const allowedOrigins = ['http://localhost:5173', 'https://fnb-web.vercel.app'];
+
 app.use(cors({
-  origin: 'http://localhost:5173', 
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 }));
+
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(express.json());
@@ -33,7 +42,6 @@ app.use('/api', categoryRoutes);
 app.use('/api', accountRoutes);
 app.use('/api', menuRoutes);
 
-
 fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   if (err) {
     console.error('No such file swagger.yaml:', err);
@@ -42,7 +50,6 @@ fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   const swaggerDocument = YAML.parse(data);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 });
-
 
 app.get('/', (req, res) => {
     res.send('Welcome to the F&B Order API');
