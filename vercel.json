@@ -1,6 +1,5 @@
 {
 	"version": 2,
-	"regions": ["ap-southeast-1"],
 	"rewrites": [
 		{
 			"source": "/(.*)",
