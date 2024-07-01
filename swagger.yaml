@@ -47,7 +47,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /api/getProducts/{id}:
+  /api/getProduct/{id}:
     get:
       summary: Get product by ID
       tags:
@@ -461,6 +461,71 @@ paths:
                   $ref: '#/components/schemas/Menu'
         '500':
           description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/getMenu/{id}:
+    get:
+      summary: Get a menu by ID
+      tags:
+        - Menu
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the menu to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A single menu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Menu'
+        '404':
+          description: Menu not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Error while getting menu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/getMenus/name/{name}:
+    get:
+      summary: Get menus by name
+      tags:
+        - Menu
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Name of the menu to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of menus
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Menu'
+        '404':
+          description: Menu not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Error while getting menu
           content:
             application/json:
               schema:
