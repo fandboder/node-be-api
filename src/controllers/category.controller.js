@@ -1,4 +1,3 @@
-const { model } = require('mongoose');
 const Category = require('../models/categoty.model');
 const { Op } = require("sequelize");
 const Menu = require('../models/menu.model');
