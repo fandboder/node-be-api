@@ -1,6 +1,8 @@
 const { Op } = require('sequelize');
 const Account = require('../models/account.model');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 exports.getAllAccounts = async (req, res) => {
     try {
@@ -15,7 +17,8 @@ exports.getAllAccounts = async (req, res) => {
 exports.addAccount = async (req, res) => {
     try {
         const { username, password, position } = req.body;
-        const newAccount = await Account.create({ username, password, position });
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const newAccount = await Account.create({ username, password: hashedPassword, position });
         res.status(201).json({ message: 'Add account success', account: newAccount });
     } catch (error) {
         console.error('Error while adding account: ', error);
@@ -43,8 +46,13 @@ exports.updateAccount = async (req, res) => {
     const { username, password, position } = req.body;
 
     try {
+        const hashedPassword = password ? await bcrypt.hash(password, saltRounds) : undefined;
+        const updateData = { username, position };
+        if (hashedPassword) {
+            updateData.password = hashedPassword;
+        }
         const updatedAccount = await Account.update(
-            { username, password, position },
+            updateData,
             { where: { id: accountId } }
         );
 
@@ -65,7 +73,8 @@ exports.login = async (req, res) => {
         if (!account) {
             return res.status(404).json({ error: 'Account not found' });
         }
-        if (password !== account.password) {
+        const match = await bcrypt.compare(password, account.password);
+        if (!match) {
             return res.status(401).json({ error: 'Incorrect password' });
         }
         const token = jwt.sign(
