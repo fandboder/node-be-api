@@ -4,18 +4,20 @@ const { Op } = require("sequelize");
 const moment = require('moment-timezone');
 const Category = require("../models/categoty.model.js");
 const Menu = require("../models/menu.model.js");
+const Attribute = require('../models/attribute.model.js');
 
 Product.hasMany(ProductImage, { foreignKey: 'product_id' });
 ProductImage.belongsTo(Product, { foreignKey: 'product_id' });
 Category.belongsTo(Menu, { foreignKey: 'menu_id' });
 Product.belongsTo(Category, { foreignKey: 'category_id' });
+Product.hasMany(Attribute, { foreignKey: 'product_id' });
 
 exports.getAllProducts = async (req, res) => {
     try {
         const products = await Product.findAll({
             include: [{
                 model: Category,
-                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
+                attributes: ['id', 'categoryId', 'categoryName', 'created_at', 'updated_at', 'menu_id'],
                 include: {
                     model: Menu,
                     attributes: ['id', 'name', 'created_at', 'updated_at']
@@ -23,8 +25,10 @@ exports.getAllProducts = async (req, res) => {
             }, {
                 model: ProductImage,
                 attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }
-            ]
+            }, {
+                model: Attribute,
+                attributes: ['id', 'product_id', 'attributeName', 'attributeValue']
+            }]
         });
         res.json(products);
     } catch (error) {
@@ -144,7 +148,7 @@ exports.getProductById = async (req, res) => {
             where: { id: productId },
             include: [{
                 model: Category,
-                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
+                attributes: ['id', 'categoryId', 'categoryName', 'created_at', 'updated_at', 'menu_id'],
                 include: {
                     model: Menu,
                     attributes: ['id', 'name', 'created_at', 'updated_at']
@@ -152,6 +156,9 @@ exports.getProductById = async (req, res) => {
             }, {
                 model: ProductImage,
                 attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
+            }, {
+                model: Attribute,
+                attributes: ['id', 'product_id', 'attributeName', 'attributeValue']
             }]
         });
         if (product) {
@@ -176,7 +183,7 @@ exports.getProductsByCategory = async (req, res) => {
             },
             include: [{
                 model: Category,
-                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
+                attributes: ['id', 'categoryId', 'categoryName', 'created_at', 'updated_at', 'menu_id'],
                 include: {
                     model: Menu,
                     attributes: ['id', 'name', 'created_at', 'updated_at']
@@ -184,8 +191,10 @@ exports.getProductsByCategory = async (req, res) => {
             }, {
                 model: ProductImage,
                 attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }
-            ]
+            }, {
+                model: Attribute,
+                attributes: ['id', 'product_id', 'attributeName', 'attributeValue']
+            }]
         });
         if (products.length > 0) {
             res.json(products);
@@ -210,7 +219,7 @@ exports.getProductByName = async (req, res) => {
             },
             include: [{
                 model: Category,
-                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
+                attributes: ['id', 'categoryId', 'categoryName', 'created_at', 'updated_at', 'menu_id'],
                 include: {
                     model: Menu,
                     attributes: ['id', 'name', 'created_at', 'updated_at']
@@ -218,8 +227,10 @@ exports.getProductByName = async (req, res) => {
             }, {
                 model: ProductImage,
                 attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }
-            ]
+            }, {
+                model: Attribute,
+                attributes: ['id', 'product_id', 'attributeName', 'attributeValue']
+            }]
         });
         if (product.length > 0) {
             res.json(product);

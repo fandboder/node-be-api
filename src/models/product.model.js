@@ -8,7 +8,15 @@ const Product = sequelize.define('Product', {
         autoIncrement: true,
         primaryKey: true
     },
+    code: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    fullName: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -16,7 +24,7 @@ const Product = sequelize.define('Product', {
         type: DataTypes.TEXT,
         allowNull: true
     },
-    price: {
+    basePrice: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false
     },
