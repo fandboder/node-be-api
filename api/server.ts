@@ -11,6 +11,7 @@ const productRoutes = require('../src/routes/product.routes');
 const categoryRoutes = require('../src/routes/category.routes');
 const accountRoutes = require('../src/routes/account.routes');
 const menuRoutes = require('../src/routes/menu.routes');
+const comboRoutes = require('../src/routes/combo.routes')
 
 dotenv.config();
 
@@ -32,7 +33,7 @@ app.use('/api', productRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', accountRoutes);
 app.use('/api', menuRoutes);
-
+app.use('/api', comboRoutes);
 
 fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   if (err) {

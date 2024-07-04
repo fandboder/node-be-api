@@ -25,6 +25,8 @@ tags:
     description: Account List
   - name: Authentication
     description: Login or Register Api
+  - name: Combos
+    description: Combos API
 
 paths:
   /api/getProducts:
@@ -845,6 +847,29 @@ paths:
         '404':
           description: "Account not found"
 
+
+
+  /api/getCombos:
+    get:
+      tags:
+        - Combos
+      summary: Get all combos
+      responses:
+        '200':
+          description: A list of combos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Combo'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     Product:
@@ -873,6 +898,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProductImage"
+        attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attribute"
       example:
         id: 1
         name: Example Product
@@ -894,6 +923,15 @@ components:
             created_at: 2024-06-23T20:16:43.507Z
             updated_at: 2024-06-23T20:16:43.507Z
             position: 2
+        attributes:
+          - id: 1
+            product_id: 1
+            attributeName: Color
+            attributeValue: Red
+          - id: 2
+            product_id: 1
+            attributeName: Size
+            attributeValue: L
 
     ProductInput:
       type: object
@@ -903,6 +941,7 @@ components:
         - price
         - category_id
         - images
+        - attributes
       properties:
         name:
           type: string
@@ -924,6 +963,17 @@ components:
               position:
                 type: integer
                 description: Vị trí của hình ảnh trong sản phẩm
+        attributes:
+          type: array
+          items:
+            type: object
+            properties:
+              attributeName:
+                type: string
+                description: Tên thuộc tính
+              attributeValue:
+                type: string
+                description: Giá trị thuộc tính
       example:
         name: New Product
         description: This is a new product
@@ -934,6 +984,11 @@ components:
             position: 1
           - url: https://example.com/image2.jpg
             position: 2
+        attributes:
+          - attributeName: Color
+            attributeValue: Red
+          - attributeName: Size
+            attributeValue: L
     ProductImage:
       type: object
       properties:
@@ -951,6 +1006,17 @@ components:
           format: date-time
         position:
           type: integer
+    Attribute:
+      type: object
+      properties:
+        id:
+          type: integer
+        product_id:
+          type: integer
+        attributeName:
+          type: string
+        attributeValue:
+          type: string
 
     Category:
       type: object
@@ -1072,6 +1138,49 @@ components:
         username: username
         password: password
 
+
+    Combo:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID of the combo
+        name:
+          type: string
+          description: Name of the combo
+        description:
+          type: string
+          description: Description of the combo
+        price:
+          type: string
+          description: Price of the combo
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the combo was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Date and time when the combo was last updated
+        ComboDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComboDetail'
+    ComboDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID of the combo detail
+        combo_id:
+          type: integer
+          description: ID of the combo
+        product_id:
+          type: integer
+          description: ID of the product in the combo
+        quantity:
+          type: integer
+          description: Quantity of the product in the combo
 
     Message:
       type: object
