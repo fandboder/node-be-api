@@ -23,7 +23,7 @@ exports.addCategory = async (req, res) => {
     try {
         const { name, menu_id } = req.body;
         const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-        const newCategory = await Category.create({ name, menu_id, created_at: currentTimeVN, updated_at: currentTimeVN });
+        const newCategory = await Category.create({ name, menu_id, createdDate: currentTimeVN, updatedDate: currentTimeVN });
         res.status(201).json({ message: 'Category added successfully', category: newCategory });
     } catch (error) {
         console.error('Error while adding category: ', error);

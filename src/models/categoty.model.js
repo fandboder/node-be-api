@@ -16,11 +16,11 @@ const Category = sequelize.define('Category', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    created_at: {
+    createdDate: {
         type: DataTypes.DATE(3),
         allowNull: true
     },
-    updated_at: {
+    modifiedDate: {
         type: DataTypes.DATE(3),
         allowNull: true
     },
