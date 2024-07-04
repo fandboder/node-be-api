@@ -39,15 +39,24 @@ exports.getAllProducts = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
     try {
-        const { name, description, price, category_id, images } = req.body;
+        const { code, name, fullName, description, basePrice, category_id, images, attributes } = req.body;
 
         const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh');
         const currentTimeUTCF = currentTimeVN.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
-        const newProduct = await Product.create({ name, description, price, category_id, created_at: currentTimeUTCF, updated_at: currentTimeUTCF });
+        const newProduct = await Product.create({ code, name, fullName, description, basePrice, category_id, created_at: currentTimeUTCF, updated_at: currentTimeUTCF });
         if (images && images.length > 0) {
             const productImages = images.map(image => ({ product_id: newProduct.id, url: image.url, position: image.position, created_at: currentTimeUTCF, updated_at: currentTimeUTCF }));
             await ProductImage.bulkCreate(productImages);
+        }
+
+        if (attributes && attributes.length > 0) {
+            const productAttributes = attributes.map(attribute => ({
+                product_id: newProduct.id,
+                attributeName: attribute.attributeName,
+                attributeValue: attribute.attributeValue
+            }));
+            await Attribute.bulkCreate(productAttributes);
         }
 
         res.status(201).json(newProduct);
