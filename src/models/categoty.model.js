@@ -10,7 +10,7 @@ const Category = sequelize.define('Category', {
     },
     categoryId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true
     },
     categoryName: {
         type: DataTypes.STRING,
@@ -26,7 +26,7 @@ const Category = sequelize.define('Category', {
     },
     menu_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true
     }
 }, {
     tableName: 'categories',
