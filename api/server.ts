@@ -11,7 +11,9 @@ const productRoutes = require('../src/routes/product.routes');
 const categoryRoutes = require('../src/routes/category.routes');
 const accountRoutes = require('../src/routes/account.routes');
 const menuRoutes = require('../src/routes/menu.routes');
-const comboRoutes = require('../src/routes/combo.routes')
+const comboRoutes = require('../src/routes/combo.routes');
+const cron = require('node-cron');
+const syncService = require('../src/sync/syncService');
 
 dotenv.config();
 
@@ -42,6 +44,12 @@ fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   }
   const swaggerDocument = YAML.parse(data);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+});
+
+
+cron.schedule('* * * * *', async () => {
+    console.log('Running sync job...');
+    await syncService.syncCategories();
 });
 
 
