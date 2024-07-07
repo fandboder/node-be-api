@@ -26,7 +26,7 @@ class CategoryService {
     }
 
 
-    async getCategoriesKyotviet() {
+    async getCategoriesKiotviet() {
         const accessToken = await getAccessToken();
         const response = await axios.get(apiUrl, {
             headers: {
@@ -55,7 +55,7 @@ class CategoryService {
     }
 
 
-    async createCategoryKyotviet(categoryData) {
+    async createCategoryKiotviet(categoryData) {
         const accessToken = await getAccessToken();
         try {
             // console.log('Category Data:', categoryData);
@@ -86,7 +86,7 @@ class CategoryService {
                 categoryName: categoryName
             };
 
-            const kiotvietCategory = await this.createCategoryKyotviet(kiotvietCategoryData);
+            const kiotvietCategory = await this.createCategoryKiotviet(kiotvietCategoryData);
 
             await newCategory.update({
                 categoryId: kiotvietCategory.data.categoryId
@@ -107,7 +107,7 @@ class CategoryService {
     }
 
 
-    async deleteCategoryKyotviet(categoryId) {
+    async deleteCategoryKiotviet(categoryId) {
         const accessToken = await getAccessToken();
         try {
             const response = await axios.delete(`${apiUrl}/${categoryId}`, {
@@ -127,7 +127,7 @@ class CategoryService {
     async deleteCategory(categoryId) {
         const transaction = await sequelize.transaction();
         try {
-            await this.deleteCategoryKyotviet(categoryId);
+            await this.deleteCategoryKiotviet(categoryId);
             const result = await Category.destroy({
                 where: { categoryId },
                 transaction
@@ -142,7 +142,7 @@ class CategoryService {
     }
 
 
-    async updateCategoryKyotviet(categoryId, categoryName) {
+    async updateCategoryKiotviet(categoryId, categoryName) {
         const accessToken = await getAccessToken();
         try {
             const response = await axios.put(`${apiUrl}/${categoryId}`, {
@@ -169,7 +169,7 @@ class CategoryService {
             const { categoryName, menu_id } = categoryData;
             const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
-            await this.updateCategoryKyotviet(categoryId, categoryName);
+            await this.updateCategoryKiotviet(categoryId, categoryName);
 
             const [updated] = await Category.update({ categoryName, menu_id, updatedDate: currentTimeVN }, { where: { categoryId }, transaction });
 

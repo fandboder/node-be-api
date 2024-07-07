@@ -17,9 +17,9 @@ exports.getCategories = async (req, res) => {
 }
 
 
-exports.getCategoriesKyotviet = async (req, res) => {
+exports.getCategoriesKiotviet = async (req, res) => {
     try {
-        const categories = await CategoryService.getCategoriesKyotviet(req.body);
+        const categories = await CategoryService.getCategoriesKiotviet(req.body);
         res.json(categories);
     } catch (error) {
         console.error('Error fetching categories:', error);
@@ -43,9 +43,9 @@ exports.getCategoryById = async (req, res) => {
 };
 
 
-exports.createCategoryKyotviet = async (req, res) => {
+exports.createCategoryKiotviet = async (req, res) => {
     try {
-        const category = await CategoryService.createCategoryKyotviet(req.body);
+        const category = await CategoryService.createCategoryKiotviet(req.body);
         res.json(category);
     } catch (error) {
         console.error('Error creating category:', error);

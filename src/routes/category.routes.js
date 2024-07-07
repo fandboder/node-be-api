@@ -17,9 +17,9 @@ router.get('/getCategories/name/:name', categoryController.getCategoryByName);
 
 router.get('/getCategories/menu/:menuId', categoryController.getCategoryByMenuId);
 
-router.get('/getCategoriesKyotviet', categoryController.getCategoriesKyotviet);
+router.get('/getCategoriesKiotviet', categoryController.getCategoriesKiotviet);
 
-router.post('/createCategoryKyotviet', categoryController.createCategoryKyotviet);
+router.post('/createCategoryKiotviet', categoryController.createCategoryKiotviet);
 
 
 
