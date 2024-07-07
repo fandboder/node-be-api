@@ -4,7 +4,8 @@ const { Op } = require("sequelize");
 const moment = require('moment-timezone');
 const Category = require("../models/categoty.model.js");
 const Menu = require("../models/menu.model.js");
-const Attribute = require('../models/attribute.model.js');
+const Attribute = require('../models/productAttribute.model.js');
+const ProductService = require('../services/product.service.js');
 
 Product.hasMany(ProductImage, { foreignKey: 'product_id' });
 ProductImage.belongsTo(Product, { foreignKey: 'product_id' });
@@ -17,7 +18,7 @@ exports.getAllProducts = async (req, res) => {
         const products = await Product.findAll({
             include: [{
                 model: Category,
-                attributes: ['id', 'categoryId', 'categoryName', 'created_at', 'updated_at', 'menu_id'],
+                attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate', 'menu_id'],
                 include: {
                     model: Menu,
                     attributes: ['id', 'name', 'created_at', 'updated_at']
@@ -36,6 +37,19 @@ exports.getAllProducts = async (req, res) => {
         res.status(500).json({ error: 'Error while getting products' });
     }
 };
+
+
+exports.getProductsKyotviet = async (req, res) => {
+    try {
+        const products = await ProductService.getProductsKyotviet(req.body);
+        res.json(products);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).json({ error: 'Error fetching products' });
+    }
+}
+
+
 
 exports.createProduct = async (req, res) => {
     try {
@@ -157,7 +171,7 @@ exports.getProductById = async (req, res) => {
             where: { id: productId },
             include: [{
                 model: Category,
-                attributes: ['id', 'categoryId', 'categoryName', 'created_at', 'updated_at', 'menu_id'],
+                attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate', 'menu_id'],
                 include: {
                     model: Menu,
                     attributes: ['id', 'name', 'created_at', 'updated_at']
@@ -192,7 +206,7 @@ exports.getProductsByCategory = async (req, res) => {
             },
             include: [{
                 model: Category,
-                attributes: ['id', 'categoryId', 'categoryName', 'created_at', 'updated_at', 'menu_id'],
+                attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate', 'menu_id'],
                 include: {
                     model: Menu,
                     attributes: ['id', 'name', 'created_at', 'updated_at']
@@ -228,7 +242,7 @@ exports.getProductByName = async (req, res) => {
             },
             include: [{
                 model: Category,
-                attributes: ['id', 'categoryId', 'categoryName', 'created_at', 'updated_at', 'menu_id'],
+                attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate', 'menu_id'],
                 include: {
                     model: Menu,
                     attributes: ['id', 'name', 'created_at', 'updated_at']

@@ -1,11 +1,22 @@
-const Product = require("../models/product.model.js");
+const axios = require('axios');
+const getAccessToken = require('../auth/auth');
+const dotenv = require('dotenv');
+dotenv.config();
 
-exports.getAllProducts = async () => {
-    try {
-        const products = await Product.findAll();
-        return products;
-    } catch (error) {
-        console.error('Error while getting products: ', error);
-        throw new Error('Error while getting products');
+const apiUrl = 'https://publicfnb.kiotapi.com/products';
+
+class ProductService {
+    async getProductsKyotviet() {
+        const accessToken = await getAccessToken();
+        const response = await axios.get(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Retailer': process.env.RETAILER_ID
+            }
+        });
+        return response.data;
     }
-};
+}
+
+module.exports = new ProductService();
+

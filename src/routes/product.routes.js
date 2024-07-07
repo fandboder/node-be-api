@@ -16,4 +16,6 @@ router.get('/getProducts/category/:categoryId', productController.getProductsByC
 
 router.get('/getProducts/name/:name', productController.getProductByName);
 
-module.exports = router;
+router.get('/getProductsKyotviet', productController.getProductsKyotviet),
+
+    module.exports = router;
