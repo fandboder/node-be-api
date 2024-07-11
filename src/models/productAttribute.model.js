@@ -8,8 +8,8 @@ const Attribute = sequelize.define('Attribute', {
         primaryKey: true,
         autoIncrement: true
     },
-    product_id: {
-        type: DataTypes.INTEGER,
+    productId: {
+        type: DataTypes.STRING,
         allowNull: false,
         references: {
             model: 'products',
@@ -29,6 +29,6 @@ const Attribute = sequelize.define('Attribute', {
     timestamps: false
 });
 
-Attribute.belongsTo(Product, { foreignKey: 'product_id' });
+Attribute.belongsTo(Product, { foreignKey: 'productId' });
 
 module.exports = Attribute;

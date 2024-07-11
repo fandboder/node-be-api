@@ -47,10 +47,13 @@ fs.readFile('swagger.yaml', 'utf8', (err, data) => {
 });
 
 
-cron.schedule('* * * * *', async () => {
-    console.log('Running sync job...');
-    await syncService.syncCategories();
-});
+// cron.schedule('* * * * *', async () => {
+//     console.log('Running sync job...');
+//     await syncService.syncCategories();
+//     await syncService.syncProducts();
+// });
+
+
 
 
 app.get('/', (req, res) => {

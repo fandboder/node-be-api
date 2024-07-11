@@ -89,6 +89,7 @@ class CategoryService {
             const kiotvietCategory = await this.createCategoryKiotviet(kiotvietCategoryData);
 
             await newCategory.update({
+                id: kiotvietCategory.data.categoryId,
                 categoryId: kiotvietCategory.data.categoryId
             }, { transaction });
 

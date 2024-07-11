@@ -28,16 +28,17 @@ const Product = sequelize.define('Product', {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false
     },
-    created_at: {
+    createdDate: {
         type: DataTypes.DATE(3),
         allowNull: true
     },
-    updated_at: {
+    modifiedDate: {
         type: DataTypes.DATE(3),
         allowNull: true
     },
-    category_id: {
+    categoryId: {
         type: DataTypes.INTEGER,
+        allowNull: false,
         references: {
             model: 'categories',
             key: 'id'
@@ -48,6 +49,6 @@ const Product = sequelize.define('Product', {
     timestamps: false
 });
 
-Product.belongsTo(Category, { foreignKey: 'category_id' });
+Product.belongsTo(Category, { foreignKey: 'categoryId' });
 
 module.exports = Product;

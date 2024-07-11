@@ -7,8 +7,8 @@ const ProductImage = sequelize.define('ProductImage', {
         autoIncrement: true,
         primaryKey: true
     },
-    product_id: {
-        type: DataTypes.INTEGER,
+    productId: {
+        type: DataTypes.STRING,
         allowNull: false,
         references: {
             model: 'products',
