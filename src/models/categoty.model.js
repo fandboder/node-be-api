@@ -8,21 +8,26 @@ const Category = sequelize.define('Category', {
         primaryKey: true,
         autoIncrement: true
     },
-    name: {
+    categoryId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        unique: true
+    },
+    categoryName: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    created_at: {
+    createdDate: {
         type: DataTypes.DATE(3),
         allowNull: true
     },
-    updated_at: {
+    modifiedDate: {
         type: DataTypes.DATE(3),
         allowNull: true
     },
     menu_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true
     }
 }, {
     tableName: 'categories',

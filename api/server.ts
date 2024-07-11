@@ -11,6 +11,9 @@ const productRoutes = require('../src/routes/product.routes');
 const categoryRoutes = require('../src/routes/category.routes');
 const accountRoutes = require('../src/routes/account.routes');
 const menuRoutes = require('../src/routes/menu.routes');
+const comboRoutes = require('../src/routes/combo.routes');
+const cron = require('node-cron');
+const syncService = require('../src/sync/syncService');
 
 dotenv.config();
 
@@ -20,7 +23,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors({
-  origin: 'http://localhost:5173', 
+  origin: 'http://localhost:5173',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 }));
@@ -32,7 +35,7 @@ app.use('/api', productRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', accountRoutes);
 app.use('/api', menuRoutes);
-
+app.use('/api', comboRoutes);
 
 fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   if (err) {
@@ -42,6 +45,15 @@ fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   const swaggerDocument = YAML.parse(data);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 });
+
+
+// cron.schedule('* * * * *', async () => {
+//     console.log('Running sync job...');
+//     await syncService.syncCategories();
+//     await syncService.syncProducts();
+// });
+
+
 
 
 app.get('/', (req, res) => {

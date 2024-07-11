@@ -1,11 +1,12 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
+const Product = require('./product.model');
 
-const ProductImage = sequelize.define('ProductImage', {
+const Attribute = sequelize.define('Attribute', {
     id: {
         type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
     },
     productId: {
         type: DataTypes.STRING,
@@ -15,25 +16,19 @@ const ProductImage = sequelize.define('ProductImage', {
             key: 'id'
         }
     },
-    url: {
+    attributeName: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    created_at: {
-        type: DataTypes.DATE(3),
-        allowNull: true
-    },
-    updated_at: {
-        type: DataTypes.DATE(3),
-        allowNull: true
-    },
-    position: {
-        type: DataTypes.INTEGER,
-        allowNull: true
+    attributeValue: {
+        type: DataTypes.STRING,
+        allowNull: false
     }
 }, {
-    tableName: 'product_images',
+    tableName: 'attributes',
     timestamps: false
 });
 
-module.exports = ProductImage;
+Attribute.belongsTo(Product, { foreignKey: 'productId' });
+
+module.exports = Attribute;

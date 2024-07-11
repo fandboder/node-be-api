@@ -4,28 +4,18 @@ const { Op } = require("sequelize");
 const moment = require('moment-timezone');
 const Category = require("../models/categoty.model.js");
 const Menu = require("../models/menu.model.js");
+const Attribute = require('../models/productAttribute.model.js');
+const ProductService = require('../services/product.service.js');
 
-Product.hasMany(ProductImage, { foreignKey: 'product_id' });
-ProductImage.belongsTo(Product, { foreignKey: 'product_id' });
+Product.hasMany(ProductImage, { foreignKey: 'productId' });
+ProductImage.belongsTo(Product, { foreignKey: 'productId' });
 Category.belongsTo(Menu, { foreignKey: 'menu_id' });
-Product.belongsTo(Category, { foreignKey: 'category_id' });
+Product.belongsTo(Category, { foreignKey: 'categoryId' });
+Product.hasMany(Attribute, { foreignKey: 'productId' });
 
-exports.getAllProducts = async (req, res) => {
+exports.getProducts = async (req, res) => {
     try {
-        const products = await Product.findAll({
-            include: [{
-                model: Category,
-                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
-                include: {
-                    model: Menu,
-                    attributes: ['id', 'name', 'created_at', 'updated_at']
-                }
-            }, {
-                model: ProductImage,
-                attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }
-            ]
-        });
+        const products = await ProductService.getProducts();
         res.json(products);
     } catch (error) {
         console.error('Error while getting products: ', error);
@@ -33,48 +23,66 @@ exports.getAllProducts = async (req, res) => {
     }
 };
 
-exports.createProduct = async (req, res) => {
+
+exports.getProductsKiotviet = async (req, res) => {
     try {
-        const { name, description, price, category_id, images } = req.body;
-
-        const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh');
-        const currentTimeUTCF = currentTimeVN.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-
-        const newProduct = await Product.create({ name, description, price, category_id, created_at: currentTimeUTCF, updated_at: currentTimeUTCF });
-        if (images && images.length > 0) {
-            const productImages = images.map(image => ({ product_id: newProduct.id, url: image.url, position: image.position, created_at: currentTimeUTCF, updated_at: currentTimeUTCF }));
-            await ProductImage.bulkCreate(productImages);
-        }
-
-        res.status(201).json(newProduct);
-
+        const products = await ProductService.getProductsKiotviet(req.body);
+        res.json(products);
     } catch (error) {
-        console.error('Lỗi khi tạo sản phẩm:', error);
-        res.status(500).json({ error: 'Lỗi khi tạo sản phẩm' });
+        console.error('Error fetching products:', error);
+        res.status(500).json({ error: 'Error fetching products' });
     }
 };
+
+
+exports.createProductKiotviet = async (req, res) => {
+    try {
+        const productKyotviet = await ProductService.createProductKiotviet(req.body);
+        res.json(productKyotviet);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).json({ error: 'Error fetching products' });
+    }
+};
+
+
+
+exports.createProduct = async (req, res) => {
+    try {
+        const productData = req.body;
+        const result = await ProductService.createProduct(productData);
+        res.status(201).json(result);
+    } catch (error) {
+        console.error('Error while creating product:', error);
+        res.status(500).json({ error: 'Error while creating product' });
+    }
+};
+
+
+exports.deleteProductKiotviet = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const result = await ProductService.deleteProductKiotviet(productId);
+        res.json({ message: `Xóa sản phẩm trên KiotViet thành công với id ${productId}`, data: result });
+    } catch (error) {
+        console.error('Error deleting product in KiotViet', error);
+        res.status(500).json({ error: 'Error deleting product in KiotViet', details: error.response?.data || error.message });
+    }
+};
+
 
 exports.deleteProduct = async (req, res) => {
     try {
         const productId = req.params.id;
-        await ProductImage.destroy({
-            where: {
-                product_id: productId
-            }
-        });
-        const deletedRows = await Product.destroy({
-            where: {
-                id: productId
-            }
-        });
-        if (deletedRows > 0) {
-            res.json({ message: 'Xóa sản phẩm thành công' });
+        const result = await ProductService.deleteProduct(productId);
+        if (result) {
+            res.json({ message: `Xóa sản phẩm thành công product có id ${productId}` });
         } else {
             res.status(404).json({ error: 'Sản phẩm không tồn tại' });
         }
     } catch (error) {
-        console.error('Error while deleting product:', error);
-        res.status(500).json({ error: 'Error while deleting product' });
+        console.error('Error deleting product', error);
+        res.status(500).json({ error: 'Error deleting product' });
     }
 };
 
@@ -139,26 +147,12 @@ exports.updateProduct = async (req, res) => {
 
 exports.getProductById = async (req, res) => {
     try {
-        const productId = req.params.id;
-        const product = await Product.findOne({
-            where: { id: productId },
-            include: [{
-                model: Category,
-                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
-                include: {
-                    model: Menu,
-                    attributes: ['id', 'name', 'created_at', 'updated_at']
-                }
-            }, {
-                model: ProductImage,
-                attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }]
-        });
-        if (product) {
-            res.json(product);
-        } else {
-            res.status(404).json({ message: 'Product not found' });
+        const id = req.params.id;
+        const product = await ProductService.getProductById(id);
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
         }
+        res.status(200).json(product);
     } catch (error) {
         console.error('Error while getting product: ', error);
         res.status(500).json({ error: 'Error while getting product' });
@@ -176,7 +170,7 @@ exports.getProductsByCategory = async (req, res) => {
             },
             include: [{
                 model: Category,
-                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
+                attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate', 'menu_id'],
                 include: {
                     model: Menu,
                     attributes: ['id', 'name', 'created_at', 'updated_at']
@@ -184,8 +178,10 @@ exports.getProductsByCategory = async (req, res) => {
             }, {
                 model: ProductImage,
                 attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }
-            ]
+            }, {
+                model: Attribute,
+                attributes: ['id', 'product_id', 'attributeName', 'attributeValue']
+            }]
         });
         if (products.length > 0) {
             res.json(products);
@@ -210,7 +206,7 @@ exports.getProductByName = async (req, res) => {
             },
             include: [{
                 model: Category,
-                attributes: ['id', 'name', 'created_at', 'updated_at', 'menu_id'],
+                attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate', 'menu_id'],
                 include: {
                     model: Menu,
                     attributes: ['id', 'name', 'created_at', 'updated_at']
@@ -218,8 +214,10 @@ exports.getProductByName = async (req, res) => {
             }, {
                 model: ProductImage,
                 attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }
-            ]
+            }, {
+                model: Attribute,
+                attributes: ['id', 'product_id', 'attributeName', 'attributeValue']
+            }]
         });
         if (product.length > 0) {
             res.json(product);
@@ -230,4 +228,7 @@ exports.getProductByName = async (req, res) => {
         console.error('Error while getting product by name: ', error);
         res.status(500).json({ error: 'Error while getting product by name' });
     }
+
+
+
 };
