@@ -275,6 +275,7 @@ class SyncService {
                     const productToDelete = localProductsMap.get(productId);
                     await Attribute.destroy({ where: { productId }, transaction });
                     await ProductImage.destroy({ where: { productId }, transaction });
+                    await Topping.destroy({ where: { productId }, transaction });
                     await productToDelete.destroy({ transaction });
                 }
 
