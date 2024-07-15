@@ -46,12 +46,17 @@ fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 });
 
-
-// cron.schedule('* * * * *', async () => {
-//     console.log('Running sync job...');
+// (async () => {
+//     console.log('Running immediate sync job...');
 //     await syncService.syncCategories();
 //     await syncService.syncProducts();
-// });
+// })();
+
+cron.schedule('* * * * *', async () => {
+    console.log('Running sync job...');
+    await syncService.syncCategories();
+    await syncService.syncProducts();
+});
 
 
 
