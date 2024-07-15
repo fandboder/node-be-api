@@ -5,6 +5,7 @@ const moment = require('moment-timezone');
 const Category = require("../models/categoty.model.js");
 const Menu = require("../models/menu.model.js");
 const Attribute = require('../models/productAttribute.model.js');
+const Topping = require('../models/topping.model.js');
 const ProductService = require('../services/product.service.js');
 
 Product.hasMany(ProductImage, { foreignKey: 'productId' });
@@ -12,6 +13,7 @@ ProductImage.belongsTo(Product, { foreignKey: 'productId' });
 Category.belongsTo(Menu, { foreignKey: 'menu_id' });
 Product.belongsTo(Category, { foreignKey: 'categoryId' });
 Product.hasMany(Attribute, { foreignKey: 'productId' });
+Product.hasMany(Topping, { foreignKey: 'productId' });
 
 exports.getProducts = async (req, res) => {
     try {
@@ -20,6 +22,17 @@ exports.getProducts = async (req, res) => {
     } catch (error) {
         console.error('Error while getting products: ', error);
         res.status(500).json({ error: 'Error while getting products' });
+    }
+};
+
+
+exports.getTopping = async (req, res) => {
+    try {
+        const products = await ProductService.getTopping();
+        res.json(products);
+    } catch (error) {
+        console.error('Error while getting topping: ', error);
+        res.status(500).json({ error: 'Error while getting topping' });
     }
 };
 
@@ -144,7 +157,6 @@ exports.updateProduct = async (req, res) => {
 };
 
 
-
 exports.getProductById = async (req, res) => {
     try {
         const id = req.params.id;
@@ -157,7 +169,7 @@ exports.getProductById = async (req, res) => {
         console.error('Error while getting product: ', error);
         res.status(500).json({ error: 'Error while getting product' });
     }
-}
+};
 
 
 exports.getProductsByCategory = async (req, res) => {

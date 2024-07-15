@@ -47,7 +47,7 @@ const Topping = sequelize.define('Topping', {
     timestamps: false
 });
 
-Topping.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
-Topping.belongsTo(Product, { foreignKey: 'productId', as: 'product' });
+Topping.belongsTo(Category, { foreignKey: 'categoryId' });
+Topping.belongsTo(Product, { foreignKey: 'productId' });
 
 module.exports = Topping;

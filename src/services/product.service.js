@@ -7,6 +7,7 @@ const Product = require('../models/product.model');
 const ProductImage = require('../models/productImage.model');
 const Attribute = require('../models/productAttribute.model');
 const Category = require('../models/categoty.model');
+const Topping = require('../models/topping.model');
 dotenv.config();
 
 const apiUrl = 'https://publicfnb.kiotapi.com/products';
@@ -39,7 +40,7 @@ class ProductService {
                         attributes: ['id', 'productId', 'attributeName', 'attributeValue']
                     }]
             });
-            console.log()
+            console.log();
             return products;
         } catch (error) {
             console.error('Error while getting products from database: ', error);
@@ -48,27 +49,44 @@ class ProductService {
     };
 
 
+    async getTopping() {
+        try {
+            const topping = await Topping.findAll();
+            return topping;
+        } catch (error) {
+            console.error('Error while getting topping from database: ', error);
+            throw new Error(`Error while getting topping from database: ${error.message}`);
+        }
+
+    }
+
+
+
     async getProductById(id) {
         try {
             const product = await Product.findOne({
                 where: { id },
-                include: [{
-                    model: Category,
-                    attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate'],
-                }, {
-                    model: ProductImage,
-                    attributes: ['id', 'productId', 'url', 'created_at', 'updated_at', 'position']
-                }, {
-                    model: Attribute,
-                    attributes: ['id', 'productId', 'attributeName', 'attributeValue']
-                }]
+                include: [
+                    {
+                        model: Category,
+                        attributes: ['id', 'categoryId', 'categoryName']
+                    },
+                    {
+                        model: ProductImage,
+                        attributes: ['id', 'productId', 'url', 'created_at', 'updated_at', 'position']
+                    },
+                    {
+                        model: Attribute,
+                        attributes: ['id', 'productId', 'attributeName', 'attributeValue']
+                    }
+                ]
             });
             return product;
         } catch (error) {
             console.error('Error while getting product by id:', error);
             throw error;
         }
-    };
+    }
 
 
     async createProductKiotviet(productData) {
