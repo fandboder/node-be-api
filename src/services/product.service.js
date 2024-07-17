@@ -49,19 +49,6 @@ class ProductService {
     };
 
 
-    async getTopping() {
-        try {
-            const topping = await Topping.findAll();
-            return topping;
-        } catch (error) {
-            console.error('Error while getting topping from database: ', error);
-            throw new Error(`Error while getting topping from database: ${error.message}`);
-        }
-
-    }
-
-
-
     async getProductById(id) {
         try {
             const product = await Product.findOne({

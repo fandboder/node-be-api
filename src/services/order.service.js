@@ -1,58 +1,53 @@
 const Order = require('../models/order.model');
-const axios = require('axios');
-const getAccessToken = require('../auth/auth');
-const dotenv = require('dotenv');
-dotenv.config();
-
-const apiUrl = 'https://publicfnb.kiotapi.com/orders';
+const OrderDetail = require('../models/orderDetail.model');
+const OrderDetailTopping = require('../models/orderDetailTopping.model');
+const { sequelize } = require('../config/database');
 
 class OrderService {
     async createOrder(orderData) {
+        const transaction = await sequelize.transaction();
         try {
-            const { productId, price, quantity, note } = orderData;
+            const { orderDate, totalPrice, note, orderDetails } = orderData;
+
 
             const order = await Order.create({
-                productId,
-                price,
-                quantity,
+                orderDate,
+                totalPrice,
                 note
-            });
+            }, { transaction });
 
+
+            for (let detail of orderDetails) {
+                const orderDetail = await OrderDetail.create({
+                    orderId: order.id,
+                    productId: detail.productId,
+                    name: detail.name,
+                    basePrice: detail.basePrice,
+                    quantity: detail.quantity
+                }, { transaction });
+
+
+                if (detail.toppings && detail.toppings.length > 0) {
+                    for (let topping of detail.toppings) {
+                        await OrderDetailTopping.create({
+                            orderId: order.id,
+                            toppingId: topping.toppingId,
+                            name: topping.name,
+                            basePrice: topping.basePrice,
+                            quantity: topping.quantity
+                        }, { transaction });
+                    }
+                }
+            }
+
+            await transaction.commit();
             return order;
         } catch (error) {
+            await transaction.rollback();
             throw new Error(`Error creating order: ${error.message}`);
         }
     }
-
-    async createOrders(ordersData) {
-        const createdOrders = [];
-        for (let orderData of ordersData) {
-            try {
-                const createdOrder = await this.createOrder(orderData);
-                createdOrders.push(createdOrder);
-            } catch (error) {
-                console.error(`Error creating order: ${error.message}`);
-            }
-        }
-        return createdOrders;
-    }
-
-    async createOrdersKiotviet(ordersKiotvetData) {
-        const accessToken = await getAccessToken();
-        try {
-            const response = await axios.post(apiUrl, ordersKiotvetData, {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Retailer': process.env.RETAILER_ID,
-                    'Content-Type': 'application/json'
-                }
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error creating order:', error.response?.data || error.message);
-            throw error;
-        }
-    }
 }
+
 
 module.exports = new OrderService();

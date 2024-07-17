@@ -13,6 +13,7 @@ const accountRoutes = require('../src/routes/account.routes');
 const menuRoutes = require('../src/routes/menu.routes');
 const comboRoutes = require('../src/routes/combo.routes');
 const orderRoutes = require('../src/routes/order.routes');
+const toppingRoutes = require('../src/routes/topping.routes');
 const cron = require('node-cron');
 const syncService = require('../src/sync/syncService');
 
@@ -38,6 +39,7 @@ app.use('/api', accountRoutes);
 app.use('/api', menuRoutes);
 app.use('/api', comboRoutes);
 app.use('/api', orderRoutes);
+app.use('/api', toppingRoutes);
 
 fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   if (err) {

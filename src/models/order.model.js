@@ -1,6 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-const Product = require('../models/product.model');
 
 const Order = sequelize.define('Order', {
     id: {
@@ -9,16 +8,12 @@ const Order = sequelize.define('Order', {
         allowNull: false,
         autoIncrement: true
     },
-    productId: {
-        type: DataTypes.INTEGER,
+    orderDate: {
+        type: DataTypes.DATE(3),
         allowNull: false,
     },
-    price: {
+    totalPrice: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: true
-    },
-    quantity: {
-        type: DataTypes.INTEGER,
         allowNull: true
     },
     note: {
@@ -29,6 +24,5 @@ const Order = sequelize.define('Order', {
     tableName: 'orders',
     timestamps: false
 });
-
 
 module.exports = Order;

@@ -26,17 +26,6 @@ exports.getProducts = async (req, res) => {
 };
 
 
-exports.getTopping = async (req, res) => {
-    try {
-        const products = await ProductService.getTopping();
-        res.json(products);
-    } catch (error) {
-        console.error('Error while getting topping: ', error);
-        res.status(500).json({ error: 'Error while getting topping' });
-    }
-};
-
-
 exports.getProductsKiotviet = async (req, res) => {
     try {
         const products = await ProductService.getProductsKiotviet(req.body);
