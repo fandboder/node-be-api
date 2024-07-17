@@ -102,56 +102,11 @@ exports.deleteProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
     try {
         const productId = req.params.id;
-        const { name, description, price, category_id, images } = req.body;
-        console.log('Received payload:', req.body);
-
-        const product = await Product.findByPk(productId);
-        if (!product) {
-            return res.status(404).json({ error: 'Sản phẩm không tồn tại' });
-        }
-
-        const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh');
-        const currentTimeUTCF = currentTimeVN.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-
-        await product.update({ name, description, price, category_id, updated_at: currentTimeUTCF });
-
-        const currentImages = await ProductImage.findAll({ where: { product_id: productId } });
-
-        if (images && images.length > 0) {
-            for (let { url, position } of images) {
-                const existingImage = currentImages.find(img => img.url === url);
-
-                if (existingImage) {
-                    if (existingImage.position !== position) {
-                        const imageToSwap = currentImages.find(img => img.position === position);
-
-                        if (imageToSwap) {
-                            await imageToSwap.update({ position: existingImage.position, updated_at: currentTimeUTCF });
-                        }
-
-                        await existingImage.update({ position, updated_at: currentTimeUTCF });
-                    } else {
-                        await existingImage.update({ updated_at: currentTimeUTCF });
-                    }
-                } else {
-                    await ProductImage.create({
-                        product_id: productId,
-                        url,
-                        created_at: currentTimeUTCF,
-                        updated_at: currentTimeUTCF,
-                        position
-                    });
-                }
-            }
-        }
-
-        const updatedProduct = await Product.findByPk(productId, {
-            include: [{ model: ProductImage, as: 'ProductImages' }]
-        });
-
-        res.json({ updatedProduct });
+        const productData = req.body;
+        const updatedProduct = await ProductService.updateProduct(productId, productData);
+        res.json(updatedProduct);
     } catch (error) {
-        console.error('Error while updating product:', error);
+        console.error('Error while updating product: ', error);
         res.status(500).json({ error: 'Error while updating product' });
     }
 };
@@ -175,26 +130,7 @@ exports.getProductById = async (req, res) => {
 exports.getProductsByCategory = async (req, res) => {
     try {
         const categoryId = req.params.categoryId;
-        const products = await Product.findAll({
-            where:
-            {
-                category_id: categoryId
-            },
-            include: [{
-                model: Category,
-                attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate', 'menu_id'],
-                include: {
-                    model: Menu,
-                    attributes: ['id', 'name', 'created_at', 'updated_at']
-                }
-            }, {
-                model: ProductImage,
-                attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }, {
-                model: Attribute,
-                attributes: ['id', 'product_id', 'attributeName', 'attributeValue']
-            }]
-        });
+        const products = await ProductService.getProductsByCategoryId(categoryId);
         if (products.length > 0) {
             res.json(products);
         } else {
