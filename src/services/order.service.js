@@ -2,14 +2,18 @@ const Order = require('../models/order.model');
 const OrderDetail = require('../models/orderDetail.model');
 const OrderDetailTopping = require('../models/orderDetailTopping.model');
 const { sequelize } = require('../config/database');
+const moment = require('moment-timezone');
 
 class OrderService {
     async createOrder(orderData) {
         const transaction = await sequelize.transaction();
         try {
-            const { orderDate, totalPrice, note, orderDetails } = orderData;
+            const { totalPrice, note, orderDetails } = orderData;
 
+            const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh');
+            const orderDate = currentTimeVN.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
+            ư
             const order = await Order.create({
                 orderDate,
                 totalPrice,
@@ -48,6 +52,5 @@ class OrderService {
         }
     }
 }
-
 
 module.exports = new OrderService();
