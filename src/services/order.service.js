@@ -51,6 +51,58 @@ class OrderService {
     }
 
 
+    async updateOrder(orderId, orderData) {
+        const transaction = await sequelize.transaction();
+        try {
+            const { totalPrice, note, orderDetails } = orderData;
+
+            // Tìm và cập nhật thông tin đơn hàng
+            const order = await Order.findByPk(orderId, { transaction });
+            if (!order) {
+                throw new Error('Order not found');
+            }
+
+            await order.update({ totalPrice, note }, { transaction });
+
+            // Xóa các chi tiết đơn hàng hiện tại và các topping liên quan
+            const currentOrderDetails = await OrderDetail.findAll({ where: { orderId: order.id }, transaction });
+            for (let detail of currentOrderDetails) {
+                await OrderDetailTopping.destroy({ where: { orderDetailId: detail.id }, transaction });
+                await detail.destroy({ transaction });
+            }
+
+            // Tạo lại các chi tiết đơn hàng và topping mới
+            for (let detail of orderDetails) {
+                const orderDetail = await OrderDetail.create({
+                    orderId: order.id,
+                    productId: detail.productId,
+                    name: detail.name,
+                    basePrice: detail.basePrice,
+                    quantity: detail.quantity
+                }, { transaction });
+
+                if (detail.OrderDetailToppings && detail.OrderDetailToppings.length > 0) {
+                    for (let topping of detail.OrderDetailToppings) {
+                        await OrderDetailTopping.create({
+                            orderDetailId: orderDetail.id,  // Correct field name
+                            toppingId: topping.toppingId,
+                            name: topping.name,
+                            basePrice: topping.basePrice,
+                            quantity: topping.quantity
+                        }, { transaction });
+                    }
+                }
+            }
+
+            await transaction.commit();
+            return order;
+        } catch (error) {
+            await transaction.rollback();
+            throw new Error(`Error updating order: ${error.message}`);
+        }
+    }
+
+
     async getOrders() {
         try {
             const orders = await Order.findAll({
