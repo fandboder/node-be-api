@@ -99,7 +99,7 @@ class SyncService {
             const transaction = await sequelize.transaction();
             try {
                 const localProducts = await Product.findAll({ transaction });
-                const localToppings = await Topping.findAll({ transaction }); // Fetch all local toppings
+                const localToppings = await Topping.findAll({ transaction });
 
                 const localProductsMap = new Map();
                 localProducts.forEach(product => {
@@ -116,6 +116,13 @@ class SyncService {
 
                 for (const kiotvietProduct of productsFromKiotViet) {
                     const { id, code, name, fullName, description, basePrice, createdDate, modifiedDate, categoryId, attributes, images, isTopping } = kiotvietProduct;
+
+                    const categoryExists = await Category.findByPk(categoryId);
+                    if (!categoryExists) {
+                        console.error(`Category with id ${categoryId} does not exist. Skipping product sync for productId ${id}.`);
+                        continue;
+                    }
+
 
                     if (localProductsMap.has(id.toString())) {
                         const product = localProductsMap.get(id.toString());

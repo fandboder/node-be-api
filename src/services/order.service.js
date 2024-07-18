@@ -52,7 +52,6 @@ class OrderService {
     }
 
 
-
     async updateOrder(orderId, orderData) {
         const transaction = await sequelize.transaction();
         try {

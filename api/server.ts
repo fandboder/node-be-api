@@ -14,6 +14,7 @@ const menuRoutes = require('../src/routes/menu.routes');
 const comboRoutes = require('../src/routes/combo.routes');
 const orderRoutes = require('../src/routes/order.routes');
 const toppingRoutes = require('../src/routes/topping.routes');
+const syncRoutes = require('../src/sync/syncRoutes');
 const cron = require('node-cron');
 const syncService = require('../src/sync/syncService');
 
@@ -40,6 +41,7 @@ app.use('/api', menuRoutes);
 app.use('/api', comboRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', toppingRoutes);
+app.use('/api', syncRoutes);
 
 fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   if (err) {
@@ -50,19 +52,11 @@ fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 });
 
-(async () => {
-    console.log('Running immediate sync job...');
-    //await syncService.syncCategories();
-    //await syncService.syncProducts();
-})();
-
-// cron.schedule('* * * * *', async () => {
-//     console.log('Running sync job...');
+// (async () => {
+//     console.log('Running immediate sync job...');
 //     await syncService.syncCategories();
 //     await syncService.syncProducts();
-// });
-
-
+// })();
 
 
 app.get('/', (req, res) => {
