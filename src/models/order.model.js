@@ -20,6 +20,10 @@ const Order = sequelize.define('Order', {
     note: {
         type: DataTypes.STRING(200),
         allowNull: true
+    },
+    status: {
+        type: DataTypes.STRING(100),
+        allowNull: true
     }
 }, {
     tableName: 'orders',

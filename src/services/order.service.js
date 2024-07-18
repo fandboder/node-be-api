@@ -9,7 +9,7 @@ class OrderService {
     async createOrder(orderData) {
         const transaction = await sequelize.transaction();
         try {
-            const { totalPrice, note, orderDetails } = orderData;
+            const { totalPrice, note, orderDetails, status } = orderData;
 
             const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh');
             const orderDate = currentTimeVN.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
@@ -17,7 +17,8 @@ class OrderService {
             const order = await Order.create({
                 orderDate,
                 totalPrice,
-                note
+                note,
+                status
             }, { transaction });
 
             for (let detail of orderDetails) {
@@ -51,27 +52,28 @@ class OrderService {
     }
 
 
+
     async updateOrder(orderId, orderData) {
         const transaction = await sequelize.transaction();
         try {
-            const { totalPrice, note, orderDetails } = orderData;
+            const { totalPrice, note, orderDetails, status } = orderData;
 
-            // Tìm và cập nhật thông tin đơn hàng
+
             const order = await Order.findByPk(orderId, { transaction });
             if (!order) {
                 throw new Error('Order not found');
             }
 
-            await order.update({ totalPrice, note }, { transaction });
+            await order.update({ totalPrice, note, status }, { transaction });
 
-            // Xóa các chi tiết đơn hàng hiện tại và các topping liên quan
+
             const currentOrderDetails = await OrderDetail.findAll({ where: { orderId: order.id }, transaction });
             for (let detail of currentOrderDetails) {
                 await OrderDetailTopping.destroy({ where: { orderDetailId: detail.id }, transaction });
                 await detail.destroy({ transaction });
             }
 
-            // Tạo lại các chi tiết đơn hàng và topping mới
+
             for (let detail of orderDetails) {
                 const orderDetail = await OrderDetail.create({
                     orderId: order.id,
@@ -84,7 +86,7 @@ class OrderService {
                 if (detail.OrderDetailToppings && detail.OrderDetailToppings.length > 0) {
                     for (let topping of detail.OrderDetailToppings) {
                         await OrderDetailTopping.create({
-                            orderDetailId: orderDetail.id,  // Correct field name
+                            orderDetailId: orderDetail.id,
                             toppingId: topping.toppingId,
                             name: topping.name,
                             basePrice: topping.basePrice,
