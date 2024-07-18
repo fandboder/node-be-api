@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-const Order = require('./order.model');
+const OrderDetail = require('./orderDetail.model');
 const Topping = require('./topping.model');
 
 const OrderDetailTopping = sequelize.define('OrderDetailTopping', {
@@ -9,11 +9,11 @@ const OrderDetailTopping = sequelize.define('OrderDetailTopping', {
         primaryKey: true,
         autoIncrement: true
     },
-    orderId: {
+    orderDetailId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'orders',
+            model: 'order_details',
             key: 'id'
         }
     },
@@ -42,7 +42,7 @@ const OrderDetailTopping = sequelize.define('OrderDetailTopping', {
     timestamps: false
 });
 
-OrderDetailTopping.belongsTo(Order, { foreignKey: 'orderId', as: 'order' });
-OrderDetailTopping.belongsTo(Topping, { foreignKey: 'toppingId', as: 'topping' });
+
+OrderDetailTopping.belongsTo(Topping, { foreignKey: 'toppingId' });
 
 module.exports = OrderDetailTopping;

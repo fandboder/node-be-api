@@ -13,7 +13,6 @@ class OrderService {
             const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh');
             const orderDate = currentTimeVN.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
-            ư
             const order = await Order.create({
                 orderDate,
                 totalPrice,
@@ -34,7 +33,7 @@ class OrderService {
                 if (detail.toppings && detail.toppings.length > 0) {
                     for (let topping of detail.toppings) {
                         await OrderDetailTopping.create({
-                            orderId: order.id,
+                            orderId: orderDetail.id,
                             toppingId: topping.toppingId,
                             name: topping.name,
                             basePrice: topping.basePrice,
@@ -49,6 +48,24 @@ class OrderService {
         } catch (error) {
             await transaction.rollback();
             throw new Error(`Error creating order: ${error.message}`);
+        }
+    }
+
+
+    async getOrderById(orderId) {
+        try {
+            const order = await Order.findOne({
+                where: { id: orderId },
+                include: [{
+                    model: OrderDetail,
+                    include: [{
+                        model: OrderDetailTopping,
+                    }]
+                }]
+            });
+            return order;
+        } catch (error) {
+            throw new Error(`Error fetching order: ${error.message}`);
         }
     }
 }

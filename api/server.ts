@@ -53,7 +53,7 @@ fs.readFile('swagger.yaml', 'utf8', (err, data) => {
 (async () => {
     console.log('Running immediate sync job...');
     //await syncService.syncCategories();
-    await syncService.syncProducts();
+    //await syncService.syncProducts();
 })();
 
 // cron.schedule('* * * * *', async () => {
