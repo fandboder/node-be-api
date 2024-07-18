@@ -22,7 +22,7 @@ const Order = sequelize.define('Order', {
         allowNull: true
     },
     status: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.INTEGER,
         allowNull: true
     }
 }, {
