@@ -1,3 +1,4 @@
+const { Sequelize } = require('sequelize');
 const Order = require('../models/order.model');
 const OrderDetail = require('../models/orderDetail.model');
 const OrderDetailTopping = require('../models/orderDetailTopping.model');
@@ -19,7 +20,6 @@ class OrderService {
                 note
             }, { transaction });
 
-
             for (let detail of orderDetails) {
                 const orderDetail = await OrderDetail.create({
                     orderId: order.id,
@@ -29,11 +29,10 @@ class OrderService {
                     quantity: detail.quantity
                 }, { transaction });
 
-
-                if (detail.toppings && detail.toppings.length > 0) {
-                    for (let topping of detail.toppings) {
+                if (detail.OrderDetailToppings && detail.OrderDetailToppings.length > 0) {
+                    for (let topping of detail.OrderDetailToppings) {
                         await OrderDetailTopping.create({
-                            orderId: orderDetail.id,
+                            orderDetailId: orderDetail.id,
                             toppingId: topping.toppingId,
                             name: topping.name,
                             basePrice: topping.basePrice,
@@ -52,6 +51,23 @@ class OrderService {
     }
 
 
+    async getOrders() {
+        try {
+            const orders = await Order.findAll({
+                include: [{
+                    model: OrderDetail,
+                    include: [{
+                        model: OrderDetailTopping,
+                    }]
+                }]
+            });
+            return orders;
+        } catch (error) {
+            throw new Error(`Error fetching order: ${error.message}`);
+        }
+    }
+
+
     async getOrderById(orderId) {
         try {
             const order = await Order.findOne({
@@ -66,6 +82,40 @@ class OrderService {
             return order;
         } catch (error) {
             throw new Error(`Error fetching order: ${error.message}`);
+        }
+    }
+
+
+    async deleteOrder(orderId) {
+        const transaction = await sequelize.transaction();
+        try {
+
+            await OrderDetailTopping.destroy({
+                where: {
+                    orderDetailId: {
+                        [Sequelize.Op.in]: Sequelize.literal(`(SELECT id FROM order_details WHERE orderId = ${orderId})`)
+                    }
+                },
+                transaction
+            });
+
+
+            await OrderDetail.destroy({
+                where: { orderId },
+                transaction
+            });
+
+
+            const result = await Order.destroy({
+                where: { id: orderId },
+                transaction
+            });
+
+            await transaction.commit();
+            return result;
+        } catch (error) {
+            await transaction.rollback();
+            throw new Error(`Error deleting order: ${error.message}`);
         }
     }
 }
