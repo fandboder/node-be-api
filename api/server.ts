@@ -25,11 +25,15 @@ connectDB();
 const app = express();
 const port = process.env.PORT || 3000;
 
+const allowedOrigins = ['http://localhost:5173', 'https://fnb-web.vercel.app'];
+
 app.use(cors({
+
   origin: 'http://localhost:5173',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 }));
+
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(express.json());
@@ -43,6 +47,7 @@ app.use('/api', orderRoutes);
 app.use('/api', toppingRoutes);
 app.use('/api', syncRoutes);
 
+
 fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   if (err) {
     console.error('No such file swagger.yaml:', err);
@@ -51,12 +56,6 @@ fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   const swaggerDocument = YAML.parse(data);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 });
-
-// (async () => {
-//     console.log('Running immediate sync job...');
-//     await syncService.syncCategories();
-//     await syncService.syncProducts();
-// })();
 
 
 app.get('/', (req, res) => {
