@@ -7,6 +7,7 @@ const Product = require('../models/product.model');
 const ProductImage = require('../models/productImage.model');
 const Attribute = require('../models/productAttribute.model');
 const Category = require('../models/categoty.model');
+const Topping = require('../models/topping.model');
 dotenv.config();
 
 const apiUrl = 'https://publicfnb.kiotapi.com/products';
@@ -39,7 +40,7 @@ class ProductService {
                         attributes: ['id', 'productId', 'attributeName', 'attributeValue']
                     }]
             });
-            console.log()
+            console.log();
             return products;
         } catch (error) {
             console.error('Error while getting products from database: ', error);
@@ -52,23 +53,54 @@ class ProductService {
         try {
             const product = await Product.findOne({
                 where: { id },
-                include: [{
-                    model: Category,
-                    attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate'],
-                }, {
-                    model: ProductImage,
-                    attributes: ['id', 'productId', 'url', 'created_at', 'updated_at', 'position']
-                }, {
-                    model: Attribute,
-                    attributes: ['id', 'productId', 'attributeName', 'attributeValue']
-                }]
+                include: [
+                    {
+                        model: Category,
+                        attributes: ['id', 'categoryId', 'categoryName']
+                    },
+                    {
+                        model: ProductImage,
+                        attributes: ['id', 'productId', 'url', 'created_at', 'updated_at', 'position']
+                    },
+                    {
+                        model: Attribute,
+                        attributes: ['id', 'productId', 'attributeName', 'attributeValue']
+                    }
+                ]
             });
             return product;
         } catch (error) {
             console.error('Error while getting product by id:', error);
             throw error;
         }
-    };
+    }
+
+
+    async getProductsByCategoryId(categoryId) {
+        try {
+            const products = await Product.findAll({
+                where: { categoryId },
+                include: [
+                    {
+                        model: Category,
+                        attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate', 'menu_id'],
+                    },
+                    {
+                        model: ProductImage,
+                        attributes: ['id', 'productId', 'url', 'created_at', 'updated_at', 'position']
+                    },
+                    {
+                        model: Attribute,
+                        attributes: ['id', 'productId', 'attributeName', 'attributeValue']
+                    }
+                ]
+            });
+            return products;
+        } catch (error) {
+            console.error('Error while getting products by category: ', error);
+            throw new Error(`Error while getting products by category: ${error.message}`);
+        }
+    }
 
 
     async createProductKiotviet(productData) {
@@ -167,6 +199,110 @@ class ProductService {
     };
 
 
+    async updateProduct(productId, productData) {
+        try {
+            const { code, name, fullName, description, basePrice, categoryId, images, attributes } = productData;
+
+            const category = await Category.findByPk(categoryId);
+            if (!category) {
+                throw new Error(`Category with id ${categoryId} does not exist.`);
+            }
+
+            const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh');
+            const currentTimeUTCF = currentTimeVN.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+
+            const product = await Product.findByPk(productId);
+            if (!product) {
+                throw new Error(`Product with id ${productId} does not exist.`);
+            }
+
+            product.code = code;
+            product.name = name;
+            product.fullName = fullName;
+            product.description = description;
+            product.basePrice = basePrice;
+            product.categoryId = categoryId;
+            product.modifiedDate = currentTimeUTCF;
+
+            await product.save();
+
+            // Delete existing images
+            await ProductImage.destroy({
+                where: { productId: productId }
+            });
+
+            // Insert new images
+            if (images && images.length > 0) {
+                for (let image of images) {
+                    await ProductImage.create({
+                        productId: productId,
+                        url: image.url,
+                        created_at: currentTimeUTCF,
+                        updated_at: currentTimeUTCF,
+                        position: image.position
+                    });
+                }
+            }
+
+            // Delete existing attributes
+            await Attribute.destroy({
+                where: { productId: productId }
+            });
+
+            // Insert new attributes
+            if (attributes && attributes.length > 0) {
+                for (let attribute of attributes) {
+                    if (!attribute.attributeName || !attribute.attributeValue) {
+                        throw new Error('Attribute name and value cannot be null');
+                    }
+                    await Attribute.create({
+                        productId: productId,
+                        attributeName: attribute.attributeName,
+                        attributeValue: attribute.attributeValue
+                    });
+                }
+            }
+
+            const kiotVietProductData = {
+                name: product.name,
+                code: product.code,
+                categoryId: product.categoryId,
+                allowsSale: true,
+                hasVariants: true,
+                basePrice: product.basePrice,
+                images: images.map(image => image.url),
+                attributes: attributes.map(attr => ({
+                    attributeName: attr.attributeName,
+                    attributeValue: attr.attributeValue
+                }))
+            };
+
+            const kiotVietProduct = await this.updateProductKiotviet(productId, kiotVietProductData);
+            return product;
+        } catch (error) {
+            console.error('Error while updating product: ', error);
+            throw new Error(`Error while updating product: ${error.message}`);
+        }
+    };
+
+    async updateProductKiotviet(productId, productData) {
+        const accessToken = await getAccessToken();
+        try {
+            const response = await axios.put(`${apiUrl}/${productId}`, productData, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Retailer': process.env.RETAILER_ID,
+                    'Content-Type': 'application/json'
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error updating product in KiotViet', error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+
     async deleteProductKiotviet(productId) {
         const accessToken = await getAccessToken();
         try {
@@ -187,10 +323,17 @@ class ProductService {
     async deleteProduct(productId) {
         const transaction = await sequelize.transaction();
         try {
-            //Xóa sản phẩm trên KiotViet
+
             await this.deleteProductKiotviet(productId);
 
-            // Xóa các thuộc tính liên quan của sản phẩm trong cơ sở dữ liệu
+            await Topping.destroy({
+                where: {
+                    productId: productId
+                },
+                transaction
+            });
+
+
             await Attribute.destroy({
                 where: {
                     productId: productId
@@ -198,7 +341,7 @@ class ProductService {
                 transaction
             });
 
-            // Xóa các hình ảnh liên quan của sản phẩm trong cơ sở dữ liệu
+
             await ProductImage.destroy({
                 where: {
                     productId: productId
@@ -206,7 +349,7 @@ class ProductService {
                 transaction
             });
 
-            // Xóa sản phẩm trong cơ sở dữ liệu
+
             const result = await Product.destroy({
                 where: { id: productId },
                 transaction
