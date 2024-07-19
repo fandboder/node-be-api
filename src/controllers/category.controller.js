@@ -1,17 +1,14 @@
-const { model } = require('mongoose');
 const Category = require('../models/categoty.model');
 const { Op } = require("sequelize");
 const Menu = require('../models/menu.model');
 const moment = require('moment-timezone');
+const CategoryService = require('../services/category.service');
+const { sequelize } = require('../config/database');
 
-exports.getAllCategories = async (req, res) => {
+
+exports.getCategories = async (req, res) => {
     try {
-        const categories = await Category.findAll({
-            include: {
-                model: Menu,
-                attributes: ['id', 'name', 'created_at', 'updated_at']
-            }
-        });
+        const categories = await CategoryService.getCategories();
         res.json(categories);
     } catch (error) {
         console.error('Error while getting categories:', error);
@@ -20,22 +17,60 @@ exports.getAllCategories = async (req, res) => {
 }
 
 
-exports.addCategory = async (req, res) => {
+exports.getCategoriesKiotviet = async (req, res) => {
     try {
-        const { name, menu_id } = req.body;
-        const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-        const newCategory = await Category.create({ name, menu_id, created_at: currentTimeVN, updated_at: currentTimeVN });
-        res.status(201).json({ message: 'Category added successfully', category: newCategory });
+        const categories = await CategoryService.getCategoriesKiotviet(req.body);
+        res.json(categories);
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        res.status(500).json({ error: 'Error fetching categories' });
+    }
+};
+
+
+exports.getCategoryById = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const category = await CategoryService.getCategoryById(categoryId);
+        if (!category) {
+            return res.status(404).json({ error: 'Category not found' });
+        }
+        res.status(200).json(category);
+    } catch (error) {
+        console.error('Error while getting category by id:', error);
+        res.status(500).json({ error: 'Error while getting category' });
+    }
+};
+
+
+exports.createCategoryKiotviet = async (req, res) => {
+    try {
+        const category = await CategoryService.createCategoryKiotviet(req.body);
+        res.json(category);
+    } catch (error) {
+        console.error('Error creating category:', error);
+        res.status(500).json({ error: 'Error creating category' });
+    }
+};
+
+
+exports.createCategory = async (req, res) => {
+    try {
+        const categoryData = req.body;
+        const result = await CategoryService.createCategory(categoryData);
+        res.status(201).json(result);
     } catch (error) {
         console.error('Error while adding category: ', error);
         res.status(500).json({ error: 'Error while adding category' });
     }
-}
+};
+
+
 
 exports.deleteCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
-        const result = await Category.destroy({ where: { id: categoryId } });
+        const result = await CategoryService.deleteCategory(categoryId);
         if (result === 0) {
             res.status(404).json({ message: 'Category not found' });
         } else {
@@ -50,42 +85,22 @@ exports.deleteCategory = async (req, res) => {
 exports.updateCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
-        const { name, menu_id } = req.body;
+        const { categoryName, menu_id } = req.body;
 
-        const currentTimeVN = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-        const [updated] = await Category.update({ name, menu_id, updated_at: currentTimeVN }, { where: { id: categoryId } });
-
-        if (updated) {
-            const updatedCategory = await Category.findByPk(categoryId);
-            res.status(200).json({ message: 'Category updated successfully', data: updatedCategory });
-        } else {
-            res.status(404).json({ error: 'Category not found' });
-        }
+        const updatedCategory = await CategoryService.updateCategory(categoryId, { categoryName, menu_id });
+        res.status(200).json({ message: 'Category updated successfully', data: updatedCategory });
     } catch (error) {
-        console.error('Error while updating category: ', error);
-        res.status(500).json({ error: 'Error while updating category' });
+        if (error.message === 'Category not found') {
+            res.status(404).json({ error: 'Category not found' });
+        } else {
+            console.error('Error while updating category:', error);
+            res.status(500).json({ error: 'Error while updating category' });
+        }
     }
 };
 
 
-exports.getCategoryById = async (req, res) => {
-    try {
-        const categoryId = req.params.id;
-        const category = await Category.findByPk(categoryId, {
-            include: {
-                model: Menu,
-                attributes: ['id', 'name', 'created_at', 'updated_at']
-            }
-        });
-        if (!category) {
-            return res.status(404).json({ error: 'Category not found' });
-        }
-        res.status(201).json(category);
-    } catch (error) {
-        console.error('Error while getting category by id:', error);
-        res.status(500).json({ error: 'Error while getting category' });
-    }
-}
+
 
 exports.getCategoryByMenuId = async (req, res) => {
     try {

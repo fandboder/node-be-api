@@ -11,6 +11,12 @@ const productRoutes = require('../src/routes/product.routes');
 const categoryRoutes = require('../src/routes/category.routes');
 const accountRoutes = require('../src/routes/account.routes');
 const menuRoutes = require('../src/routes/menu.routes');
+const comboRoutes = require('../src/routes/combo.routes');
+const orderRoutes = require('../src/routes/order.routes');
+const toppingRoutes = require('../src/routes/topping.routes');
+const syncRoutes = require('../src/sync/syncRoutes');
+const cron = require('node-cron');
+const syncService = require('../src/sync/syncService');
 
 dotenv.config();
 
@@ -22,13 +28,8 @@ const port = process.env.PORT || 3000;
 const allowedOrigins = ['http://localhost:5173', 'https://fnb-web.vercel.app'];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+
+  origin: 'http://localhost:5173',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 }));
@@ -41,6 +42,11 @@ app.use('/api', productRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', accountRoutes);
 app.use('/api', menuRoutes);
+app.use('/api', comboRoutes);
+app.use('/api', orderRoutes);
+app.use('/api', toppingRoutes);
+app.use('/api', syncRoutes);
+
 
 fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   if (err) {
@@ -50,6 +56,7 @@ fs.readFile('swagger.yaml', 'utf8', (err, data) => {
   const swaggerDocument = YAML.parse(data);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 });
+
 
 app.get('/', (req, res) => {
     res.send('Welcome to the F&B Order API');
