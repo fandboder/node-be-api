@@ -72,6 +72,15 @@ class SyncService {
                     await categoryToDelete.destroy({ transaction });
                 }
 
+
+                for (const kiotvietCategory of categoriesFromKiotViet) {
+                    const { categoryId } = kiotvietCategory;
+                    await Category.update(
+                        { id: categoryId },
+                        { where: { categoryId }, transaction }
+                    );
+                }
+
                 await transaction.commit();
                 console.log('Categories synced successfully');
             } catch (error) {
