@@ -34,6 +34,5 @@ const Category = sequelize.define('Category', {
     timestamps: false,
 });
 
-Category.belongsTo(Menu, { foreignKey: 'menu_id' });
 
 module.exports = Category;

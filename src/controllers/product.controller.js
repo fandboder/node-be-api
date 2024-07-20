@@ -135,37 +135,14 @@ exports.getProductsByCategory = async (req, res) => {
 exports.getProductByName = async (req, res) => {
     try {
         const name = req.params.name;
-        const product = await Product.findAll({
-            where: {
-                name: {
-                    [Op.like]: `%${name}%`
-                }
-            },
-            include: [{
-                model: Category,
-                attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate', 'menu_id'],
-                include: {
-                    model: Menu,
-                    attributes: ['id', 'name', 'created_at', 'updated_at']
-                }
-            }, {
-                model: ProductImage,
-                attributes: ['id', 'product_id', 'url', 'created_at', 'updated_at', 'position']
-            }, {
-                model: Attribute,
-                attributes: ['id', 'product_id', 'attributeName', 'attributeValue']
-            }]
-        });
-        if (product.length > 0) {
-            res.json(product);
+        const products = await ProductService.getProductByName(name);
+
+        if (products.length > 0) {
+            res.json(products);
         } else {
             res.status(404).json({ error: 'Product not found' });
         }
     } catch (error) {
-        console.error('Error while getting product by name: ', error);
         res.status(500).json({ error: 'Error while getting product by name' });
     }
-
-
-
 };

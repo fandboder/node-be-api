@@ -128,24 +128,12 @@ exports.getCategoryByMenuId = async (req, res) => {
 
 exports.getCategoryByName = async (req, res) => {
     try {
-        const name = req.params.name;
-        const categories = await Category.findAll({
-            where: {
-                name: {
-                    [Op.like]: `%${name}%`
-                }
-            },
-            include: {
-                model: Menu,
-                attributes: ['id', 'name', 'created_at', 'updated_at']
-            }
-        });
-
-        if (categories.length === 0) {
+        const categoryName = req.params.name;
+        const categories = await CategoryService.getCategoryByName(categoryName);
+        if (!categories || categories.length === 0) {
             return res.status(404).json({ error: 'Category not found' });
         }
-
-        res.json(categories);
+        res.status(200).json(categories);
     } catch (error) {
         console.error('Error while getting category by name:', error);
         res.status(500).json({ error: 'Error while getting category by name' });

@@ -7,6 +7,7 @@ const apiUrl = 'https://publicfnb.kiotapi.com/categories';
 const Category = require('../models/categoty.model');
 const { sequelize } = require('../config/database');
 const moment = require('moment-timezone');
+const { Op } = require('sequelize');
 
 class CategoryService {
 
@@ -185,6 +186,24 @@ class CategoryService {
         } catch (error) {
             await transaction.rollback();
             console.error('Error while updating category:', error);
+            throw error;
+        }
+    }
+
+
+    async getCategoryByName(categoryName) {
+        try {
+            const categories = await Category.findAll({
+                where: {
+                    categoryName: {
+                        [Op.like]: `%${categoryName}%`
+                    }
+                }
+            });
+
+            return categories;
+        } catch (error) {
+            console.error('Error while getting category by name:', error);
             throw error;
         }
     }

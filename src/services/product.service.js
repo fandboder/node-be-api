@@ -8,6 +8,7 @@ const ProductImage = require('../models/productImage.model');
 const Attribute = require('../models/productAttribute.model');
 const Category = require('../models/categoty.model');
 const Topping = require('../models/topping.model');
+const { Op } = require('sequelize');
 dotenv.config();
 
 const apiUrl = 'https://publicfnb.kiotapi.com/products';
@@ -76,6 +77,34 @@ class ProductService {
     }
 
 
+    async getProductByName(name) {
+        try {
+            const products = await Product.findAll({
+                where: {
+                    name: {
+                        [Op.like]: `%${name}%`
+                    }
+                },
+                include: [{
+                    model: Category,
+                    attributes: ['id', 'categoryId', 'categoryName', 'createdDate', 'modifiedDate', 'menu_id'],
+                }, {
+                    model: ProductImage,
+                    attributes: ['id', 'productId', 'url', 'created_at', 'updated_at', 'position']
+                }, {
+                    model: Attribute,
+                    attributes: ['id', 'productId', 'attributeName', 'attributeValue']
+                }]
+            });
+
+            return products;
+        } catch (error) {
+            console.error('Error while getting product by name:', error);
+            throw error;
+        }
+    }
+
+
     async getProductsByCategoryId(categoryId) {
         try {
             const products = await Product.findAll({
@@ -113,7 +142,7 @@ class ProductService {
                     'Content-Type': 'application/json'
                 }
             });
-            console.log(response.data);
+            // console.log(response.data);
             return response.data;
         } catch (error) {
             console.error('Error while creating product in KiotViet: ', error);
