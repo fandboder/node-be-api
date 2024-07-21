@@ -67,3 +67,14 @@ exports.deleteOrder = async (req, res) => {
     }
 };
 
+
+exports.getRevenue = async (req, res) => {
+    try {
+        const result = await OrderService.getRevenue();
+        res.json(result);
+    } catch (error) {
+        console.error('Error fetching revenue and order count for today:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+

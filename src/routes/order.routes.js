@@ -12,4 +12,7 @@ router.delete('/orders/:orderId', orderController.deleteOrder);
 
 router.put('/orders/:orderId', orderController.updateOrder);
 
+router.get('/orders/revenue/today', orderController.getRevenue);
+
+
 module.exports = router;

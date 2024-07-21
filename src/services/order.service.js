@@ -171,6 +171,29 @@ class OrderService {
             throw new Error(`Error deleting order: ${error.message}`);
         }
     }
+
+
+    async getRevenue() {
+        try {
+            const today = moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+            const endOfToday = moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+
+            const result = await sequelize.query(`
+                SELECT
+                    COALESCE(SUM(totalPrice), 0) AS totalRevenue,
+                    COALESCE(COUNT(id), 0) AS orderCount
+                FROM orders
+                WHERE orderDate BETWEEN :startDate AND :endDate
+            `, {
+                replacements: { startDate: today, endDate: endOfToday },
+                type: Sequelize.QueryTypes.SELECT
+            });
+
+            return result[0];
+        } catch (error) {
+            throw new Error(`Error fetching revenue and order count for today: ${error.message}`);
+        }
+    }
 }
 
 module.exports = new OrderService();
