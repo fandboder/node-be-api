@@ -82,7 +82,7 @@ exports.login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-        res.status(200).json({ message: 'Login successful', token: token });
+        res.status(200).json({ message: 'Login successful', token: token, position: account.position });
     } catch (error) {
         console.error('Error while logging in: ', error);
         res.status(500).json({ error: 'Internal server error' });
